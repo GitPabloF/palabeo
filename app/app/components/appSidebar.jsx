@@ -1,5 +1,9 @@
+"use client"
 import Link from "next/link"
 import Image from "next/image"
+import { useEffect, useState } from "react"
+
+import { usePathname } from "next/navigation"
 import { FEATURES } from "@/content/main"
 
 import {
@@ -15,6 +19,8 @@ import {
 } from "@/components/ui/sidebar"
 
 export default function AppSidebar() {
+  const pathname = usePathname()
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -38,34 +44,43 @@ export default function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {FEATURES.map((feature) => (
-                <SidebarMenuItem key={feature.id}>
-                  <SidebarMenuButton asChild>
-                    <Link
-                      href={`/app/${feature.path}`}
-                      className="transition-colors duration-200 py-2 px-5
-                       hover:text-white"
+              {FEATURES.map((feature) => {
+                const isActive = pathname === `/app/${feature.path}`
+                return (
+                  <SidebarMenuItem key={feature.id}>
+                    <SidebarMenuButton
+                      asChild
+                      className={`hover:text-brand-orange hover:font-extrabold transition-colors ${
+                        isActive
+                          ? "bg-brand-orange/10 font-extrabold text-brand-orange"
+                          : ""
+                      }`}
                     >
-                      {/* ICON */}
-                      <div
-                        className={`${feature.color} rounded-lg w-[32] h-[32] flex align-center justify-center`}
+                      <Link
+                        href={`/app/${feature.path}`}
+                        className="transition-colors duration-200 py-2 px-5"
                       >
-                        <Image
-                          src={`/icons/${feature.icon}.svg`}
-                          alt={feature.name}
-                          width={16}
-                          height={15}
-                          priority
-                        />
-                      </div>
-                      {/* feature NAME */}
-                      <span className={`uppercase font-semibold text-base`}>
-                        {feature.name}
-                      </span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+                        <span className="flex items-center gap-2 transition-transform peer-hover/menu-button:translate-x-2">
+                          <div
+                            className={`${feature.color} rounded-lg w-[32px] h-[32px] flex items-center justify-center`}
+                          >
+                            <Image
+                              src={`/icons/${feature.icon}.svg`}
+                              alt={feature.name}
+                              width={16}
+                              height={15}
+                              priority
+                            />
+                          </div>
+                          <span className="capitalize font-semibold text-base">
+                            {feature.name}
+                          </span>
+                        </span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
