@@ -15,13 +15,27 @@ export default function Word({
   id,
   word,
   translatedWord,
+  createdAt,
   lang,
   onDelete,
 }: WordProps) {
   const [showTranslation, setShowTranslation] = useState(true)
 
+  /**
+   * @description Get the number of days ago from the createdAt date
+   * @param createdAt - The createdAt date
+   * @returns The number of days ago
+   */
+  function getDaysAgo(createdAt: string) {
+    const createdAtDate = new Date(createdAt)
+    const now = new Date()
+    const diffTime = Math.abs(now.getTime() - createdAtDate.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays
+  }
+
   return (
-    <Card className="gap-4 relative">
+    <Card className="gap-1 relative">
       <CardHeader className="absolut">
         {/* action buttons */}
         <CardAction className="text-gray-400 absolute">
@@ -53,7 +67,7 @@ export default function Word({
       </CardContent>
 
       {/* translation */}
-      <CardContent className="flex flex-col gap-2">
+      <CardContent className="flex flex-col gap-2 mt-4">
         <Separator />
 
         <div className="flex justify-between items-center">
@@ -102,6 +116,11 @@ export default function Word({
           </Button>
         </div>
       </CardContent>
+      <div className="text-sm text-gray-400 self-end px-6">
+        <span className="text-sm text-gray-400 px-4">
+          Added {getDaysAgo(createdAt)} days ago
+        </span>
+      </div>
     </Card>
   )
 }
