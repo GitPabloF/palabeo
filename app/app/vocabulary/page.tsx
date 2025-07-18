@@ -8,7 +8,6 @@ import { Search } from "lucide-react"
 import CustomPagination from "@/components/block/customPagination"
 import { Word as WordType } from "@/types/word"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
-
 import { useSearchParams } from "next/navigation"
 
 import Image from "next/image"
