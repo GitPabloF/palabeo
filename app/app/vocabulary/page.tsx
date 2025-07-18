@@ -16,127 +16,129 @@ import Link from "next/link"
 export default function Vocabulary() {
   const [parent] = useAutoAnimate()
 
-  const WORDS: WordType[] = [
-    {
-      id: 0,
-      word: "el gato",
-      translatedWord: "le chat",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-    {
-      id: 1,
-      word: "hablar",
-      translatedWord: "parler",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-    {
-      id: 2,
-      word: "comer",
-      translatedWord: "manger",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-    {
-      id: 3,
-      word: "beber",
-      translatedWord: "boire",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-    {
-      id: 4,
-      word: "vivir",
-      translatedWord: "vivre",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-    {
-      id: 5,
-      word: "libro",
-      translatedWord: "livre",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-    {
-      id: 6,
-      word: "escuela",
-      translatedWord: "école",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-    {
-      id: 7,
-      word: "amigo",
-      translatedWord: "ami",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-    {
-      id: 8,
-      word: "casa",
-      translatedWord: "maison",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-    {
-      id: 9,
-      word: "perro",
-      translatedWord: "chien",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-    {
-      id: 10,
-      word: "ciudad",
-      translatedWord: "ville",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-    {
-      id: 11,
-      word: "coche",
-      translatedWord: "voiture",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-    {
-      id: 12,
-      word: "sol",
-      translatedWord: "soleil",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-    {
-      id: 13,
-      word: "noche",
-      translatedWord: "nuit",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-    {
-      id: 14,
-      word: "agua",
-      translatedWord: "eau",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-    {
-      id: 16,
-      word: "fuego",
-      translatedWord: "feu",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-    {
-      id: 17,
-      word: "árbol",
-      translatedWord: "arbre",
-      lang: "es",
-      createdAt: "2025-01-01",
-    },
-  ]
+  // const WORDS: WordType[] = [
+  //   {
+  //     id: 0,
+  //     word: "el gato",
+  //     translatedWord: "le chat",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  //   {
+  //     id: 1,
+  //     word: "hablar",
+  //     translatedWord: "parler",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  //   {
+  //     id: 2,
+  //     word: "comer",
+  //     translatedWord: "manger",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  //   {
+  //     id: 3,
+  //     word: "beber",
+  //     translatedWord: "boire",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  //   {
+  //     id: 4,
+  //     word: "vivir",
+  //     translatedWord: "vivre",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  //   {
+  //     id: 5,
+  //     word: "libro",
+  //     translatedWord: "livre",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  //   {
+  //     id: 6,
+  //     word: "escuela",
+  //     translatedWord: "école",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  //   {
+  //     id: 7,
+  //     word: "amigo",
+  //     translatedWord: "ami",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  //   {
+  //     id: 8,
+  //     word: "casa",
+  //     translatedWord: "maison",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  //   {
+  //     id: 9,
+  //     word: "perro",
+  //     translatedWord: "chien",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  //   {
+  //     id: 10,
+  //     word: "ciudad",
+  //     translatedWord: "ville",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  //   {
+  //     id: 11,
+  //     word: "coche",
+  //     translatedWord: "voiture",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  //   {
+  //     id: 12,
+  //     word: "sol",
+  //     translatedWord: "soleil",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  //   {
+  //     id: 13,
+  //     word: "noche",
+  //     translatedWord: "nuit",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  //   {
+  //     id: 14,
+  //     word: "agua",
+  //     translatedWord: "eau",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  //   {
+  //     id: 16,
+  //     word: "fuego",
+  //     translatedWord: "feu",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  //   {
+  //     id: 17,
+  //     word: "árbol",
+  //     translatedWord: "arbre",
+  //     lang: "es",
+  //     createdAt: "2025-01-01",
+  //   },
+  // ]
+
+  const WORDS: WordType[] = []
 
   const [words, setWords] = useState<WordType[]>(WORDS)
 
@@ -195,9 +197,17 @@ export default function Vocabulary() {
           ref={parent}
           className="flex-1 overflow-y-auto flex flex-col gap-5 px-10"
         >
-          {wordsDisplayed.map((word) => (
-            <Word key={word.id} {...word} onDelete={handleDelete} />
-          ))}
+          {wordsDisplayed.length > 0 ? (
+            wordsDisplayed.map((word) => (
+              <Word key={word.id} {...word} onDelete={handleDelete} />
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center py-10 text-gray-400">
+              <p className="text-lg font-medium">
+                Looks like you haven’t added any words. Let’s fix that!
+              </p>
+            </div>
+          )}
         </div>
       </div>
       <CustomPagination length={totalWords} pageSize={pageSize} index={page} />

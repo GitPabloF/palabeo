@@ -31,7 +31,18 @@ export default function Word({
     const now = new Date()
     const diffTime = Math.abs(now.getTime() - createdAtDate.getTime())
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    return diffDays
+    // handle months and days
+    if (diffDays > 30) {
+      const months = Math.floor(diffDays / 30)
+      if (months === 1) {
+        return "1 month ago"
+      }
+      return `${months} months ago`
+    }
+    if (diffDays === 1) {
+      return "1 day ago"
+    }
+    return `${diffDays} days ago`
   }
 
   return (
@@ -118,7 +129,7 @@ export default function Word({
       </CardContent>
       <div className="text-sm text-gray-400 self-end px-6">
         <span className="text-sm text-gray-400 px-4">
-          Added {getDaysAgo(createdAt)} days ago
+          Added {getDaysAgo(createdAt)}
         </span>
       </div>
     </Card>
