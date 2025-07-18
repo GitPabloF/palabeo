@@ -4,23 +4,43 @@ import { Eye, EyeClosed, Trash, FilePenLine } from "lucide-react"
 import { Card, CardAction, CardContent, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
-import { Word as WordProps } from "@/types/word"
+import { Word as WordType } from "@/types/word"
 
-export default function Word({ word, translatedWord, lang }: WordProps) {
+// TODO: add onEdit
+type WordProps = WordType & {
+  onDelete: (id: number) => void
+}
+
+export default function Word({
+  id,
+  word,
+  translatedWord,
+  lang,
+  onDelete,
+}: WordProps) {
   const [showTranslation, setShowTranslation] = useState(true)
 
   return (
     <Card className="gap-4 relative">
       <CardHeader className="absolut">
+        {/* action buttons */}
         <CardAction className="text-gray-400 absolute">
-          <button className="px-1 py-1 hover:text-gray-700 cursor-pointer">
+          <button
+            className="px-1 py-1 hover:text-gray-700 cursor-pointer"
+            onClick={() => onDelete(id)}
+          >
             <Trash size={20} />
           </button>
-          <button className="px-1 py-1 hover:text-gray-700 cursor-pointer">
+          <button
+            className="px-1 py-1 hover:text-gray-700 cursor-pointer"
+            onClick={() => {}}
+          >
             <FilePenLine size={20} />
           </button>
         </CardAction>
       </CardHeader>
+
+      {/* word */}
       <CardContent className="">
         <div className="flex items-center gap-2">
           <span className="text-lg font-bold">{word}</span>
@@ -32,6 +52,7 @@ export default function Word({ word, translatedWord, lang }: WordProps) {
         </div>
       </CardContent>
 
+      {/* translation */}
       <CardContent className="flex flex-col gap-2">
         <Separator />
 
@@ -43,7 +64,7 @@ export default function Word({ word, translatedWord, lang }: WordProps) {
           >
             {translatedWord}
           </span>
-
+          {/* show translation button */}
           <Button
             variant="ghost"
             className="text-blue-400 text-sm font-bold gap-1 hover:text-blue-400"
