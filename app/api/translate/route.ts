@@ -1,0 +1,72 @@
+import { NextRequest } from "next/server"
+import { NextResponse } from "next/server"
+
+export const runtime = "nodejs"
+
+/**
+ * Handle GET requests for translating a word using the WordReference API.
+ *
+ * @param {NextRequest} request - The incoming HTTP request with query parameters.
+ * @returns {Promise<NextResponse>} - A JSON response containing the translation data or an error.
+ *
+ * Expected query parameters:
+ * - `word` (required): the word to translate.
+ * - `from` (optional): source language code (default is 'es').
+ * - `to` (optional): target language code (default is 'fr').
+ */
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url)
+  const word = searchParams.get("word")
+  const from = searchParams.get("from") || "es"
+  const to = searchParams.get("to") || "fr"
+
+  if (!word || !from || !to) {
+    return NextResponse.json(
+      { error: "Missing parameter: 'word' | 'from' | 'to'" },
+      { status: 400 }
+    )
+  }
+  try {
+    const wr = await import("wordreference-api")
+
+    const result = await wr(word, from, to)
+
+    // formated data
+    const translation = result.translations[0].translations[0] || "erreur"
+
+    if (!translation || !translation.to) {
+      return NextResponse.json(
+        {
+          error: "Could not extract translation from API response.",
+        },
+        {
+          status: 500,
+        }
+      )
+    }
+
+    const formattedData = {
+      from: translation.from || word,
+      to: translation.to,
+      type: translation.fromType || "unknown",
+      example: {
+        from: translation.example?.from?.[0] || null,
+        to: translation.example?.to?.[0] || null,
+      },
+    }
+
+    return NextResponse.json(
+      { message: "sucess", data: formattedData },
+      { status: 200 }
+    )
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: `Server error: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      },
+      { status: 500 }
+    )
+  }
+}
