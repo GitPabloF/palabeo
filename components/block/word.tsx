@@ -6,6 +6,9 @@ import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
 import { Word as WordType } from "@/types/word"
 
+import { getDaysAgo } from "@/utilis/formatDate"
+import { formatType } from "@/utilis/formatWord"
+
 // TODO: add onEdit
 type WordProps = WordType & {
   onDelete: (id: number) => void
@@ -20,30 +23,6 @@ export default function Word({
   onDelete,
 }: WordProps) {
   const [showTranslation, setShowTranslation] = useState(true)
-
-  /**
-   * @description Get the number of days ago from the createdAt date
-   * @param createdAt - The createdAt date
-   * @returns The number of days ago
-   */
-  function getDaysAgo(createdAt: string) {
-    const createdAtDate = new Date(createdAt)
-    const now = new Date()
-    const diffTime = Math.abs(now.getTime() - createdAtDate.getTime())
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    // handle months and days
-    if (diffDays > 30) {
-      const months = Math.floor(diffDays / 30)
-      if (months === 1) {
-        return "1 month ago"
-      }
-      return `${months} months ago`
-    }
-    if (diffDays === 1) {
-      return "1 day ago"
-    }
-    return `${diffDays} days ago`
-  }
 
   return (
     <Card className="gap-1 relative">
