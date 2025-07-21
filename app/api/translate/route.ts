@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     const result = await wr(word, from, to)
 
     // formated data
-    const translation = result.translations[0].translations[0] || "erreur"
+    const translation = result.translations?.[0]?.translations?.[0]
 
     if (!translation || !translation.to) {
       return NextResponse.json(
