@@ -35,3 +35,14 @@ export const FEATURES = [
     path: "settings",
   },
 ]
+
+export const LANG = {
+  fr: {
+    name: "french",
+    exemple: "bonjour, merci, s'il vous plaît",
+  },
+  es: {
+    name: "spanish",
+    exemple: "hola, gracias, por favor",
+  },
+}

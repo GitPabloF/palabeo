@@ -1,4 +1,6 @@
-export type Lang = "fr" | "es"
+import { LANG } from "@/content/main"
+
+export type LangCode = keyof typeof LANG
 
 export type Word = {
   id: number
@@ -11,8 +13,8 @@ export type Word = {
     type: "adj" | "nf" | "nm" | "nm" | "vi" | "vt"
   }
   lang: {
-    from: Lang
-    to: Lang
+    from: LangCode
+    to: LangCode
   }
   example: {
     from: string
