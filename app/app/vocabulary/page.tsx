@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
 import CustomPagination from "@/components/block/customPagination"
+import { Card, CardContent } from "@/components/ui/card"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 import { Word as WordType } from "@/types/main"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
@@ -13,6 +15,7 @@ import { useSearchParams } from "next/navigation"
 
 import Image from "next/image"
 import Link from "next/link"
+import ShowButton from "@/components/ui/showButton"
 
 export default function Vocabulary() {
   const [parent] = useAutoAnimate()
@@ -165,6 +168,7 @@ export default function Vocabulary() {
   ]
 
   const [words, setWords] = useState<WordType[]>(WORDS)
+  const [showAllTranslation, setShowAllTranslation] = useState(false)
 
   const searchParams = useSearchParams()
   const page = Number(searchParams.get("page") || 1)
@@ -175,6 +179,8 @@ export default function Vocabulary() {
   const startIndex = (page - 1) * pageSize
   const endIndex = startIndex + pageSize
   const wordsDisplayed = words.slice(startIndex, endIndex)
+  const filterButtonClass =
+    "bg-gray-100 text-black px-3 py-2 hover:bg-brand-orange/10 hover:text-brand-orange text-base"
 
   /**
    * @description Delete a word from the vocabulary
@@ -217,22 +223,45 @@ export default function Vocabulary() {
             </Button>
           </div>
         </div>
-        <div
-          ref={parent}
-          className="flex-1 overflow-y-auto flex flex-col gap-5 px-10"
-        >
-          {wordsDisplayed.length > 0 ? (
-            wordsDisplayed.map((word) => (
-              <Word key={word.id} {...word} onDelete={handleDelete} />
-            ))
-          ) : (
-            <div className="flex flex-col items-center justify-center py-10 text-gray-400">
-              <p className="text-lg font-medium">
-                Looks like you haven’t added any words. Let’s fix that!
-              </p>
-            </div>
-          )}
+        <div className="px-10">
+          <Card>
+            <CardContent className="flex justify-between ">
+              <div className="flex items-center gap-4">
+                <span className="font-bold">Filter by:</span>
+                <div className="flex gap-1.5">
+                  <Button className={filterButtonClass}>All Words</Button>
+                  <Button className={filterButtonClass}>Recently Added</Button>
+                </div>
+              </div>
+              <ShowButton
+                type="multiple"
+                showTranslation={showAllTranslation}
+                setShowTranslation={setShowAllTranslation}
+              />
+            </CardContent>
+          </Card>
         </div>
+        <ScrollArea className="flex-1 flex px-10 mt-7 h-72 rounded-2xl">
+          <div className="flex-1 flex flex-col gap-5 " ref={parent}>
+            {wordsDisplayed.length > 0 ? (
+              wordsDisplayed.map((word) => (
+                <Word
+                  key={word.id}
+                  {...word}
+                  onDelete={handleDelete}
+                  showAllTranslation={showAllTranslation}
+                />
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center py-10 text-gray-400">
+                <p className="text-lg font-medium">
+                  Looks like you haven’t added any words. Let’s fix that!
+                </p>
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+        {/* </div> */}
       </div>
       <CustomPagination length={totalWords} pageSize={pageSize} index={page} />
     </div>

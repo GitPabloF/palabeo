@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Eye, EyeClosed, Trash, FilePenLine } from "lucide-react"
 import { Card, CardAction, CardContent, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -9,10 +9,12 @@ import { useAutoAnimate } from "@formkit/auto-animate/react"
 
 import { getDaysAgo } from "@/utilis/formatDate"
 import AppAlertDialog from "@/app/app/components/appAlertDialog"
+import ShowButton from "../ui/showButton"
 
 // TODO: add onEdit
 type WordProps = WordType & {
   onDelete: (id: number) => void
+  showAllTranslation: boolean
 }
 
 export default function Word({
@@ -23,9 +25,15 @@ export default function Word({
   example,
   lang,
   onDelete,
+  showAllTranslation,
 }: WordProps) {
-  const [showTranslation, setShowTranslation] = useState(true)
   const [parent] = useAutoAnimate()
+
+  const [showTranslation, setShowTranslation] = useState(true)
+
+  useEffect(() => {
+    setShowTranslation(showAllTranslation)
+  }, [showAllTranslation])
 
   const typeColor: Record<
     "verb" | "nf" | "nm" | "adj" | "vi" | "vt" | "adv",
@@ -117,40 +125,7 @@ export default function Word({
           )}
         </div>
         <div className="flex justify-between items-center gap-0.5">
-          <button
-            className="text-blue-400 text-sm font-bold gap-2 hover:text-blue-600 flex items-center cursor-pointer"
-            onClick={() => setShowTranslation((v) => !v)}
-          >
-            <div className="relative w-6 h-6  translate-x-1/6">
-              <Eye
-                className={`
-                  absolute top-0 left-0 w-full h-full
-                  transition-opacity duration-200 ease-in-out
-                  ${
-                    !showTranslation
-                      ? "opacity-100"
-                      : "opacity-0 pointer-events-none"
-                  }
-                `}
-              />
-              <EyeClosed
-                className={`
-                  absolute top-0 left-0 w-full h-full
-                  transition-opacity duration-200 ease-in-out
-                  ${
-                    showTranslation
-                      ? "opacity-100"
-                      : "opacity-0 pointer-events-none"
-                  }
-                `}
-              />
-            </div>
-            <div>
-              <span>
-                {showTranslation ? " Hide Translation" : "Show Translation"}
-              </span>
-            </div>
-          </button>
+          <ShowButton {...{ showTranslation, setShowTranslation }} />
           <span className="text-sm text-gray-400 inline-block">
             Added {getDaysAgo(createdAt)}
           </span>
