@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
-
+import { formatType } from "@/utilis/formatWord"
 export const runtime = "nodejs"
 
 /**
@@ -56,13 +56,24 @@ export async function GET(request: NextRequest) {
     }
 
     const formattedData = {
-      from: translation.from || word,
-      to: translation.to,
-      type: translation.fromType || "unknown",
+      id: crypto.randomUUID(),
+      word: {
+        from: translation.from || word,
+        to: translation.to,
+      },
+      type: {
+        name: formatType(translation.fromType),
+        type: translation.fromType || "unknown",
+      },
+      lang: {
+        from,
+        to,
+      },
       example: {
         from: translation.example?.from?.[0] || null,
         to: translation.example?.to?.[0] || null,
       },
+      createdAt: "2025-01-01",
     }
 
     return NextResponse.json(
