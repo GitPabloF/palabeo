@@ -1,9 +1,8 @@
 "use client"
 import { useEffect, useState } from "react"
-import { Eye, EyeClosed, Trash, FilePenLine } from "lucide-react"
+import { Trash, FilePenLine } from "lucide-react"
 import { Card, CardAction, CardContent, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Button } from "@/components/ui/button"
 import { Word as WordType } from "@/types/main"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 
