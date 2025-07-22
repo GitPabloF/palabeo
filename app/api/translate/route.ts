@@ -27,11 +27,21 @@ export async function GET(request: NextRequest) {
     )
   }
   try {
-    const wr = await import("wordreference-api")
+    const proxyBaseUrl = process.env.WORDREFERENCE_PROXY_URL
+    if (!proxyBaseUrl) {
+      console.error("WORDREFERENCE_PROXY_URL environment variable is not set.")
+      return NextResponse.json(
+        { error: "Server configuration error." },
+        { status: 500 }
+      )
+    }
+    const proxyUrl = `${proxyBaseUrl}/translate?word=${encodeURIComponent(
+      word
+    )}&from=${from}&to=${to}`
+    const res = await fetch(proxyUrl)
+    const result = await res.json()
 
-    const result = await wr(word, from, to)
-
-    // formated data
+    // formated data (identique à avant)
     const translation = result.translations?.[0]?.translations?.[0]
 
     if (!translation || !translation.to) {
