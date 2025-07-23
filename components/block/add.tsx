@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, use } from "react"
-import Image from "next/image"
+import { Plus } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -20,16 +20,20 @@ import {
 import { Input } from "@/components/ui/input"
 
 const formSchema = z.object({
-  from: z.string().min(1, {
-    message: "Please enter a valid word",
-  }),
+  from: z.string(),
 })
 
 type AddProps = {
   displayWord: (word: Word | null) => void
+  onLoadingChange: (loading: boolean) => void
+  addWord: () => void
 }
 
-export default function Add({ displayWord }: AddProps) {
+export default function Add({
+  displayWord,
+  onLoadingChange,
+  addWord,
+}: AddProps) {
   // sample gloabl lang data
   const userLanguage = "fr"
   const leanedLanguage = "es"
@@ -54,21 +58,24 @@ export default function Add({ displayWord }: AddProps) {
   useEffect(() => {
     async function translateWord() {
       setError(null)
+      setTranslatedWord(null)
       if (watchedWord && watchedWord.length > 2) {
         try {
+          onLoadingChange?.(true)
           const response = await fetch(
             `/api/translate?word=${encodeURIComponent(watchedWord)}`
           )
           if (!response.ok) {
+            onLoadingChange?.(false)
             setError("an error has ocurred")
             return
           }
-          console.log(response)
           const json = await response.json()
-          console.log(json)
+          onLoadingChange?.(false)
           const newWord: Word = json.data
           setTranslatedWord(newWord)
         } catch (error) {
+          onLoadingChange?.(false)
           console.error("Translation error:", error)
         }
       }
@@ -85,8 +92,11 @@ export default function Add({ displayWord }: AddProps) {
   }, [translatedWord])
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
     form.reset()
+  }
+
+  function resetForm() {
+    form.reset
   }
 
   function toggleDirection() {
@@ -148,18 +158,24 @@ export default function Add({ displayWord }: AddProps) {
                 </span>
               </Button>
 
-              <Button
-                className="bg-brand-orange/90 font-bold hover:bg-brand-orange cursor-pointer disabled:bg-brand-orange/70"
-                disabled={!form.formState.isValid}
-              >
-                <Image
-                  src="/icons/plus.svg"
-                  alt="Palabeo"
-                  width={14}
-                  height={14}
-                />
-                <span className="ml-2">Add the word</span>
-              </Button>
+              <div className="flex gap-2 w-full">
+                <Button
+                  className="font-bold cursor-pointer gap-0 flex-1/2"
+                  variant="secondary"
+                  disabled={!translatedWord}
+                  onClick={resetForm}
+                >
+                  <span className="ml-2">Cancel</span>
+                </Button>
+                <Button
+                  className="bg-brand-orange/90 font-bold hover:bg-brand-orange cursor-pointer disabled:bg-brand-orange/70 gap-0 flex-1/2"
+                  disabled={!translatedWord}
+                  onClick={addWord}
+                >
+                  <Plus size={36} strokeWidth={3} />
+                  <span className="ml-2">Add the word</span>
+                </Button>
+              </div>
             </div>
           </form>
         </Form>
