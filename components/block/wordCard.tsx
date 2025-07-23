@@ -73,8 +73,8 @@ export default function WordCard({
       text: "bg-violet-100",
     },
     pron: {
-      bg: "text-amber-600",
-      text: "bg-amber-100",
+      bg: "text-pink-600",
+      text: "bg-pink-100",
     },
   }
 
