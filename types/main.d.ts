@@ -1,7 +1,25 @@
-import { LANG } from "@/content/main"
+import { LANG, WORD_TYPE } from "@/content/main"
+
+export type Feature = {
+  id: number
+  name: string
+  color: string
+  icon: string
+  path: string
+}
+
+// LANG
+export type Lang = {
+  name: string
+  exemple: string
+}
 
 export type LangCode = keyof typeof LANG
 
+export type WordTypeCode = keyof typeof WORD_TYPE
+export type WordTypeName = (typeof WORD_TYPE)[WordTypeCode]
+
+// WORD
 export type Word = {
   id: number
   word: {
@@ -9,8 +27,8 @@ export type Word = {
     to: string
   }
   type: {
-    name: "noun masculine" | "verb" | "adjecitve" | "noun masculine" | "adverb"
-    type: "adj" | "nf" | "nm" | "nm" | "vi" | "vt"
+    name: WordTypeName
+    type: WordTypeCode
   }
   lang: {
     from: LangCode

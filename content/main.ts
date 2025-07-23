@@ -1,4 +1,6 @@
-export const FEATURES = [
+import { Feature, Lang } from "@/types/main"
+
+export const FEATURES: Feature[] = [
   {
     id: 1,
     name: "add words",
@@ -36,7 +38,17 @@ export const FEATURES = [
   },
 ]
 
-export const LANG = {
+export const WORD_TYPE: Record<string, string> = {
+  adj: "adjective",
+  nf: "noun feminine",
+  nm: "noun masculine",
+  vi: "verb intransitive",
+  vt: "verb transitive",
+  adv: "adverb",
+  pron: "pronoun",
+}
+
+export const LANG: Record<string, Lang> = {
   fr: {
     name: "french",
     exemple: "bonjour, merci, s'il vous plaît",
