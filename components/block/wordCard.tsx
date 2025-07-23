@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { Trash, FilePenLine } from "lucide-react"
 import { Card, CardAction, CardContent, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Word as WordType, LangCode } from "@/types/main"
+import { Word as WordType, LangCode, WordTypeCode } from "@/types/main"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 
 import { getDaysAgo } from "@/utilis/formatDate"
@@ -12,8 +12,8 @@ import ShowButton from "../ui/showButton"
 
 // TODO: add onEdit
 type WordCardProps = WordType & {
-  onDelete: (id: number) => void
-  showAllTranslation: boolean
+  onDelete?: (id: number) => void
+  showAllTranslation?: boolean
   status?: "loading" | "pending" | "added"
 }
 
@@ -38,13 +38,12 @@ export default function WordCard({
     `http://purecatamphetamine.github.io/country-flag-icons/3x2/${lang.toUpperCase()}.svg`
 
   useEffect(() => {
-    setShowTranslation(showAllTranslation)
+    if (status === "added" && showAllTranslation !== undefined) {
+      setShowTranslation(showAllTranslation)
+    }
   }, [showAllTranslation])
 
-  const typeColor: Record<
-    "verb" | "nf" | "nm" | "adj" | "vi" | "vt" | "adv",
-    { bg: string; text: string }
-  > = {
+  const typeColor: Record<WordTypeCode, { bg: string; text: string }> = {
     verb: {
       bg: "text-blue-600",
       text: "bg-blue-100",
@@ -73,6 +72,10 @@ export default function WordCard({
       bg: "text-violet-600",
       text: "bg-violet-100",
     },
+    pron: {
+      bg: "text-amber-600",
+      text: "bg-amber-100",
+    },
   }
 
   function getTypeColors(type: keyof typeof typeColor) {
@@ -82,21 +85,26 @@ export default function WordCard({
   return (
     <Card
       ref={parent}
-      className={`gap-1 relative group rounded-xl shadow-md p-4 transition-all opacity-80 border-brand-orange border-dashed
-        ${status === "pending" && "animate-wiggle"}`}
+      className={`gap-1 relative group rounded-xl shadow-md p-4 transition-all
+        ${
+          status === "pending" &&
+          "animate-wiggle opacity-70 border-brand-orange border-dashed"
+        }`}
     >
       <CardHeader className="absolut gap-0">
         {/* action buttons */}
         <CardAction className="text-gray-400 absolute transition-opacity duration-200 ease-in-out opacity-0 group-hover:opacity-100 ">
-          <AppAlertDialog
-            title="Delete this word?"
-            description="This word will be permanently removed from your list. This action cannot be undone."
-            onConfirm={() => onDelete(id)}
-          >
-            <button className="px-1 py-1 hover:text-gray-700 cursor-pointer">
-              <Trash size={20} />
-            </button>
-          </AppAlertDialog>
+          {status === "added" && (
+            <AppAlertDialog
+              title="Delete this word?"
+              description="This word will be permanently removed from your list. This action cannot be undone."
+              onConfirm={() => onDelete?.(id)}
+            >
+              <button className="px-1 py-1 hover:text-gray-700 cursor-pointer">
+                <Trash size={20} />
+              </button>
+            </AppAlertDialog>
+          )}
         </CardAction>
       </CardHeader>
       {/* word */}
