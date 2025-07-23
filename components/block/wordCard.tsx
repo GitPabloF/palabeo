@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { Trash, FilePenLine } from "lucide-react"
 import { Card, CardAction, CardContent, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Word as WordType } from "@/types/main"
+import { Word as WordType, LangCode } from "@/types/main"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 
 import { getDaysAgo } from "@/utilis/formatDate"
@@ -11,12 +11,13 @@ import AppAlertDialog from "@/app/app/components/appAlertDialog"
 import ShowButton from "../ui/showButton"
 
 // TODO: add onEdit
-type WordProps = WordType & {
+type WordCardProps = WordType & {
   onDelete: (id: number) => void
   showAllTranslation: boolean
+  status?: "loading" | "pending" | "added"
 }
 
-export default function Word({
+export default function WordCard({
   id,
   word,
   createdAt,
@@ -24,11 +25,17 @@ export default function Word({
   example,
   lang,
   onDelete,
+  status = "added",
   showAllTranslation,
-}: WordProps) {
+}: WordCardProps) {
   const [parent] = useAutoAnimate()
 
   const [showTranslation, setShowTranslation] = useState(true)
+
+  const displayTranslation = showTranslation || status === "pending"
+
+  const flagURL = (lang: LangCode) =>
+    `http://purecatamphetamine.github.io/country-flag-icons/3x2/${lang.toUpperCase()}.svg`
 
   useEffect(() => {
     setShowTranslation(showAllTranslation)
@@ -73,7 +80,11 @@ export default function Word({
   }
 
   return (
-    <Card className="gap-1 relative group" ref={parent}>
+    <Card
+      ref={parent}
+      className={`gap-1 relative group rounded-xl shadow-md p-4 transition-all opacity-80 border-brand-orange border-dashed
+        ${status === "pending" && "animate-wiggle"}`}
+    >
       <CardHeader className="absolut gap-0">
         {/* action buttons */}
         <CardAction className="text-gray-400 absolute transition-opacity duration-200 ease-in-out opacity-0 group-hover:opacity-100 ">
@@ -99,36 +110,34 @@ export default function Word({
         </span>
         <div className="flex items-center gap-2">
           <span className="text-lg font-bold capitalize">{word.to}</span>
-          <img
-            src="http://purecatamphetamine.github.io/country-flag-icons/3x2/ES.svg"
-            alt="ES"
-            className="w-5 h-5"
-          />
+          <img src={flagURL(lang.to)} alt={lang.to} className="w-5 h-5" />
         </div>
-        {example?.from && <p className="italic mt-0.5">"{example.from}"</p>}
+        {example?.from && <p className="italic mt-0.5">"{example.to}"</p>}
       </CardContent>
 
       {/* translation */}
       <CardContent className="flex gap-2 mt-4 flex-col">
         <Separator />
         <div ref={parent}>
-          {showTranslation && (
+          {displayTranslation && (
             <div className="flex flex-col pb-1.5">
               <span className="text-lg font-bold capitalize text-slate-400">
                 {word.from}
               </span>
               {example?.to && (
-                <p className="italic mt-0.5 text-slate-600">"{example.to}"</p>
+                <p className="italic mt-0.5 text-slate-600">"{example.from}"</p>
               )}
             </div>
           )}
         </div>
-        <div className="flex justify-between items-center gap-0.5">
-          <ShowButton {...{ showTranslation, setShowTranslation }} />
-          <span className="text-sm text-gray-400 inline-block">
-            Added {getDaysAgo(createdAt)}
-          </span>
-        </div>
+        {status === "added" && (
+          <div className="flex justify-between items-center gap-0.5">
+            <ShowButton {...{ showTranslation, setShowTranslation }} />
+            <span className="text-sm text-gray-400 inline-block">
+              Added {getDaysAgo(createdAt)}
+            </span>
+          </div>
+        )}
       </CardContent>
     </Card>
   )
