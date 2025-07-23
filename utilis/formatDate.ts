@@ -4,11 +4,15 @@
  * @returns The number of days ago
  */
 export function getDaysAgo(createdAt: string): string {
-  const createdAtDate = new Date(createdAt)
-  const now = new Date()
-  const diffTime = Math.abs(now.getTime() - createdAtDate.getTime())
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  // handle months and days
+  const today = new Date().toDateString()
+  const createdDate = new Date(createdAt).toDateString()
+
+  if (today === createdDate) {
+    return "today"
+  }
+
+  const diffTime = new Date(today).getTime() - new Date(createdDate).getTime()
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
   if (diffDays > 30) {
     const months = Math.floor(diffDays / 30)
     if (months === 1) {

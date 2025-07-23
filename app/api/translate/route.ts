@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
         from: exampleFrom || null || translation.example?.from?.[0],
         to: exampleTo || null || translation.example?.to?.[0],
       },
-      createdAt: "2025-01-01",
+      createdAt: new Date().toISOString().split("T")[0],
     }
 
     return NextResponse.json(

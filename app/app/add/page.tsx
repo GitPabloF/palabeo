@@ -4,6 +4,7 @@ import { useState } from "react"
 import { LangCode, Word as WordType } from "@/types/main"
 import WordCard from "@/components/block/wordCard"
 import CardSkeleton from "@/components/ui/cardSkeleton"
+import { useAutoAnimate } from "@formkit/auto-animate/react"
 
 // sample data
 const userLanguage: LangCode = "fr"
@@ -14,6 +15,9 @@ export default function Words() {
   const [translatedWord, setTranslatedWord] = useState<null | WordType>(null)
   const [isLoading, setIsLoading] = useState(false)
 
+  const [addedWordsParent] = useAutoAnimate()
+  const [translationParent] = useAutoAnimate()
+
   function handleTranslatedWord(word: WordType | null) {
     setTranslatedWord(word)
   }
@@ -21,13 +25,9 @@ export default function Words() {
   function addWord() {
     if (!translatedWord) return
 
-    const newWord = {
-      ...translatedWord,
-      createdAt: new Date().toISOString().split("T")[0],
-    }
-
-    setAddedWord((prevWords) => [...prevWords, newWord])
+    setAddedWord((prevWords) => [...prevWords, translatedWord])
   }
+
   return (
     <div className="max-w-[900px] mx-auto pt-20 h-screen pb-5 flex flex-col gap-6">
       <section id="add">
@@ -39,16 +39,19 @@ export default function Words() {
           leanedLanguage={leanedLanguage}
         />
       </section>
-      {isLoading ? (
-        <CardSkeleton />
-      ) : (
-        translatedWord && <WordCard {...translatedWord} status="pending" />
-      )}
-      {/* display recently added Word */}
+
+      <div ref={translationParent}>
+        {isLoading ? (
+          <CardSkeleton />
+        ) : (
+          translatedWord && <WordCard {...translatedWord} status="pending" />
+        )}
+      </div>
+
       {addedWord.length > 0 && (
         <section className="mt-8">
           <h3 className="text-lg font-bold mb-4">Mots ajoutés récemment :</h3>
-          <div className="flex flex-col gap-4">
+          <div ref={addedWordsParent} className="flex flex-col gap-4">
             {addedWord
               .slice(-3)
               .reverse()
