@@ -158,7 +158,7 @@ export default function Add({ displayWord }: AddProps) {
                   width={14}
                   height={14}
                 />
-                <span className="ml-2">Add Word</span>
+                <span className="ml-2">Add the word</span>
               </Button>
             </div>
           </form>

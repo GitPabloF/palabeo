@@ -2,7 +2,8 @@
 import Add from "@/components/block/add"
 import { useState } from "react"
 import { LangCode, Word as WordType } from "@/types/main"
-import Word from "@/components/block/word"
+import WordCard from "@/components/block/wordCard"
+import CardSkeleton from "@/components/ui/cardSkeleton"
 
 export default function Words() {
   const [translatedWord, setTranslatedWord] = useState<null | WordType>(null)
@@ -12,11 +13,11 @@ export default function Words() {
     console.log("Reçu du composant enfant :", word)
   }
   return (
-    <div className="px-10 pt-20 pb-40 flex justify-center flex-col gap-25">
+    <div className="max-w-[900px] mx-auto pt-20 h-screen pb-5 flex flex-col gap-6">
       <section id="add">
         <Add displayWord={handleTranslatedWord} />
       </section>
-      {translatedWord && <Word {...translatedWord} />}
+      {translatedWord && <WordCard {...translatedWord} status="pending" />}
     </div>
   )
 }
