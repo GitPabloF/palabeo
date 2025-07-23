@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
   const word = searchParams.get("word")
   const from = searchParams.get("from") || "es"
   const to = searchParams.get("to") || "fr"
+  const isReversedLang = searchParams.get("isReversedLang") === "true"
 
   if (!word || !from || !to) {
     return NextResponse.json(
@@ -55,23 +56,32 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    const wordFrom = isReversedLang ? translation.to : translation.from
+    const wordTo = isReversedLang ? translation.from : translation.to
+    const exampleFrom = isReversedLang
+      ? translation.example?.to?.[0]
+      : translation.example?.from?.[0]
+    const exampleTo = isReversedLang
+      ? translation.example?.from?.[0]
+      : translation.example?.to?.[0]
+
     const formattedData = {
       id: crypto.randomUUID(),
       word: {
-        from: translation.from || word,
-        to: translation.to,
+        from: wordFrom,
+        to: wordTo,
       },
       type: {
         name: formatType(translation.fromType),
         type: translation.fromType || "unknown",
       },
       lang: {
-        from,
-        to,
+        from: isReversedLang ? to : from,
+        to: isReversedLang ? from : to,
       },
       example: {
-        from: translation.example?.from?.[0] || null,
-        to: translation.example?.to?.[0] || null,
+        from: exampleFrom || null || translation.example?.from?.[0],
+        to: exampleTo || null || translation.example?.to?.[0],
       },
       createdAt: "2025-01-01",
     }

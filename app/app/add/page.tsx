@@ -5,6 +5,10 @@ import { LangCode, Word as WordType } from "@/types/main"
 import WordCard from "@/components/block/wordCard"
 import CardSkeleton from "@/components/ui/cardSkeleton"
 
+// sample data
+const userLanguage: LangCode = "fr"
+const leanedLanguage: LangCode = "es"
+
 export default function Words() {
   const [addedWord, setAddedWord] = useState<[] | WordType[]>([])
   const [translatedWord, setTranslatedWord] = useState<null | WordType>(null)
@@ -31,6 +35,8 @@ export default function Words() {
           displayWord={handleTranslatedWord}
           onLoadingChange={setIsLoading}
           addWord={addWord}
+          userLanguage={userLanguage}
+          leanedLanguage={leanedLanguage}
         />
       </section>
       {isLoading ? (

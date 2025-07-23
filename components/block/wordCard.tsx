@@ -23,7 +23,7 @@ export default function WordCard({
   createdAt,
   type,
   example,
-  lang,
+  lang = { from: "es", to: "fr" },
   onDelete,
   status = "added",
   showAllTranslation,

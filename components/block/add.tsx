@@ -27,21 +27,22 @@ type AddProps = {
   displayWord: (word: Word | null) => void
   onLoadingChange: (loading: boolean) => void
   addWord: () => void
+  userLanguage: LangCode
+  leanedLanguage: LangCode
 }
 
 export default function Add({
   displayWord,
   onLoadingChange,
   addWord,
+  userLanguage,
+  leanedLanguage,
 }: AddProps) {
-  // sample gloabl lang data
-  const userLanguage = "fr"
-  const leanedLanguage = "es"
-  //
-  const [fromLang, setFromLang] = useState<LangCode>(leanedLanguage)
-  const [toLang, setToLang] = useState<LangCode>(userLanguage)
+  const [fromLang, setFromLang] = useState<LangCode>(userLanguage)
+  const [toLang, setToLang] = useState<LangCode>(leanedLanguage)
   const [error, setError] = useState<string | null>(null)
   const [translatedWord, setTranslatedWord] = useState<null | Word>(null)
+  const [isReversedLang, setIsReversedLang] = useState(false)
 
   const flagURL = (lang: LangCode) =>
     `http://purecatamphetamine.github.io/country-flag-icons/3x2/${lang.toUpperCase()}.svg`
@@ -63,7 +64,9 @@ export default function Add({
         try {
           onLoadingChange?.(true)
           const response = await fetch(
-            `/api/translate?word=${encodeURIComponent(watchedWord)}`
+            `/api/translate?word=${encodeURIComponent(
+              watchedWord
+            )}&from=${fromLang}&to=${toLang}&isReversedLang=${isReversedLang}`
           )
           if (!response.ok) {
             onLoadingChange?.(false)
@@ -100,6 +103,7 @@ export default function Add({
   }
 
   function toggleDirection() {
+    setIsReversedLang(!isReversedLang)
     setFromLang((prev) =>
       prev === userLanguage ? leanedLanguage : userLanguage
     )
