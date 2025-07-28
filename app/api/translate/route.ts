@@ -57,6 +57,7 @@ export async function GET(request: NextRequest) {
     }
 
     const wordFrom = isReversedLang ? translation.to : translation.from
+    const typeCode = isReversedLang ? translation.fromType : translation.toType
     const wordTo = isReversedLang ? translation.from : translation.to
     const exampleFrom = isReversedLang
       ? translation.example?.to?.[0]
@@ -69,8 +70,8 @@ export async function GET(request: NextRequest) {
       id: crypto.randomUUID(),
       wordFrom,
       wordTo,
-      typeCode: translation.fromType || "unknown",
-      typeName: formatType(translation.fromType),
+      typeCode: typeCode || "unknown",
+      typeName: formatType(typeCode),
       langFrom: isReversedLang ? to : from,
       langTo: isReversedLang ? from : to,
       exampleFrom: exampleFrom || null || translation.example?.from?.[0],
