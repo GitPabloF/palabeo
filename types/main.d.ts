@@ -22,21 +22,13 @@ export type WordTypeName = (typeof WORD_TYPE)[WordTypeCode]
 // WORD
 export type Word = {
   id: number
-  word: {
-    from: string
-    to: string
-  }
-  type: {
-    name: WordTypeName
-    type: WordTypeCode
-  }
-  lang: {
-    from: LangCode
-    to: LangCode
-  }
-  example: {
-    from: string
-    to: string
-  }
-  createdAt: string
+  wordFrom: string
+  wordTo: string
+  typeCode: WordTypeCode
+  typeName: WordTypeName
+  langFrom: LangCode
+  langTo: LangCode
+  exampleFrom: string
+  exampleTo: string
+  createdAt: string | Date
 }

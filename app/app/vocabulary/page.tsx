@@ -32,7 +32,7 @@ export default function Vocabulary() {
     currentPage,
   })
 
-  const handleDelete = async (id: number) => {
+  async function handleDelete(id: number) {
     const success = await deleteWord(id)
     if (!success) {
       console.error("Error deleting word")

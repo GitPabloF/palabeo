@@ -19,11 +19,15 @@ type WordCardProps = WordType & {
 
 export default function WordCard({
   id,
-  word,
+  wordFrom,
+  wordTo,
+  typeCode,
+  typeName,
+  langFrom,
+  langTo,
+  exampleFrom,
+  exampleTo,
   createdAt,
-  type,
-  example,
-  lang = { from: "es", to: "fr" },
   onDelete,
   status = "added",
   showAllTranslation,
@@ -110,17 +114,17 @@ export default function WordCard({
       {/* word */}
       <CardContent>
         <span
-          className={`py-1 px-1.5 ${getTypeColors(type.type).bg} ${
-            getTypeColors(type.type).text
+          className={`py-1 px-1.5 ${getTypeColors(typeCode).bg} ${
+            getTypeColors(typeCode).text
           } text-xs font-bold rounded-2xl mb-1 inline-block capitalize`}
         >
-          {type.name}
+          {typeName}
         </span>
         <div className="flex items-center gap-2">
-          <span className="text-lg font-bold capitalize">{word.to}</span>
-          <img src={flagURL(lang.to)} alt={lang.to} className="w-5 h-5" />
+          <span className="text-lg font-bold capitalize">{wordTo}</span>
+          <img src={flagURL(langTo)} alt={langTo} className="w-5 h-5" />
         </div>
-        {example?.from && <p className="italic mt-0.5">"{example.to}"</p>}
+        {exampleTo && <p className="italic mt-0.5">"{exampleTo}"</p>}
       </CardContent>
 
       {/* translation */}
@@ -130,10 +134,10 @@ export default function WordCard({
           {displayTranslation && (
             <div className="flex flex-col pb-1.5">
               <span className="text-lg font-bold capitalize text-slate-400">
-                {word.from}
+                {wordFrom}
               </span>
-              {example?.to && (
-                <p className="italic mt-0.5 text-slate-600">"{example.from}"</p>
+              {exampleFrom && (
+                <p className="italic mt-0.5 text-slate-600">"{exampleFrom}"</p>
               )}
             </div>
           )}
@@ -142,7 +146,7 @@ export default function WordCard({
           <div className="flex justify-between items-center gap-0.5">
             <ShowButton {...{ showTranslation, setShowTranslation }} />
             <span className="text-sm text-gray-400 inline-block">
-              Added {getDaysAgo(createdAt)}
+              Added {getDaysAgo(createdAt.toString())}
             </span>
           </div>
         )}

@@ -67,22 +67,14 @@ export async function GET(request: NextRequest) {
 
     const formattedData = {
       id: crypto.randomUUID(),
-      word: {
-        from: wordFrom,
-        to: wordTo,
-      },
-      type: {
-        name: formatType(translation.fromType),
-        type: translation.fromType || "unknown",
-      },
-      lang: {
-        from: isReversedLang ? to : from,
-        to: isReversedLang ? from : to,
-      },
-      example: {
-        from: exampleFrom || null || translation.example?.from?.[0],
-        to: exampleTo || null || translation.example?.to?.[0],
-      },
+      wordFrom,
+      wordTo,
+      typeCode: translation.fromType || "unknown",
+      typeName: formatType(translation.fromType),
+      langFrom: isReversedLang ? to : from,
+      langTo: isReversedLang ? from : to,
+      exampleFrom: exampleFrom || null || translation.example?.from?.[0],
+      exampleTo: exampleTo || null || translation.example?.to?.[0],
       createdAt: new Date().toISOString().split("T")[0],
     }
 

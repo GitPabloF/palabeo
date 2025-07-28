@@ -1,5 +1,4 @@
 import { Word } from "@/lib/generated/prisma"
-import { transformWordForCard } from "@/utils/wordTransformers"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import WordCard from "@/components/block/wordCard"
 import CardSkeleton from "@/components/ui/cardSkeleton"
@@ -45,7 +44,7 @@ export function VocabularyList({
       {words.map((word) => (
         <WordCard
           key={word.id}
-          {...transformWordForCard(word)}
+          {...word}
           onDelete={onDelete}
           showAllTranslation={showAllTranslation}
         />

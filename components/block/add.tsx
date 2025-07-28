@@ -43,8 +43,11 @@ export default function Add({
   const [translatedWord, setTranslatedWord] = useState<null | Word>(null)
   const [isReversedLang, setIsReversedLang] = useState(false)
 
-  const flagURL = (lang: LangCode) =>
-    `http://purecatamphetamine.github.io/country-flag-icons/3x2/${lang.toUpperCase()}.svg`
+  const flagURL = (lang: LangCode) => {
+    let langCode = lang.toUpperCase()
+    if (langCode === "EN") langCode = "US"
+    return `http://purecatamphetamine.github.io/country-flag-icons/3x2/${langCode}.svg`
+  }
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
