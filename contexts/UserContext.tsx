@@ -6,11 +6,14 @@ import {
   ReactNode,
   useEffect,
 } from "react"
+import { LangCode } from "@/types/main"
 
 interface User {
   id: string
   email: string
   name: string | null
+  userLanguage: LangCode
+  learnedLanguage: LangCode
 }
 
 interface UserContextType {
@@ -29,9 +32,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
     // for the moment add the default test user
 
     const defaultUser: User = {
-      id: "cmdhebpym0000v1tp39smvfh7",
+      id: "cmdn5vhti0001v1tpol560amw",
       email: "test@example.com",
       name: "Test User",
+      userLanguage: "en",
+      learnedLanguage: "es",
     }
 
     setCurrentUser(defaultUser)
