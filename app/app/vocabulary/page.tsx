@@ -21,7 +21,6 @@ export default function Vocabulary() {
   const currentPage = Number(searchParams.get("page") || 1)
   const pageSize = 15
 
-  // ✅ Utilisation des hooks spécialisés
   const { searchTerm, setSearchTerm, filteredItems } = useSearch({
     items: words,
     searchFields: ["wordFrom", "wordTo"],
