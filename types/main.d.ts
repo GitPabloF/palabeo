@@ -17,7 +17,6 @@ export type Lang = {
 export type LangCode = keyof typeof LANG
 
 export type WordTypeCode = keyof typeof WORD_TYPE
-export type WordTypeName = (typeof WORD_TYPE)[WordTypeCode]
 
 // WORD
 export type Word = {
@@ -25,7 +24,7 @@ export type Word = {
   wordFrom: string
   wordTo: string
   typeCode: WordTypeCode
-  typeName: WordTypeName
+  typeName: String
   langFrom: LangCode
   langTo: LangCode
   exampleFrom: string

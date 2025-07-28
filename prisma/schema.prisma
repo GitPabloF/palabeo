@@ -55,6 +55,7 @@ enum LangCode {
 
 enum WordTypeCode {
   adj
+  n
   nf
   nm
   vi
