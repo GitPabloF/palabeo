@@ -57,6 +57,10 @@ export const LANG: Record<string, Lang> = {
     name: "spanish",
     exemple: "hola, gracias, por favor",
   },
+  en: {
+    name: "english",
+    exemple: "hello, thank you, please",
+  },
 }
 
 const WORDS: Word[] = [

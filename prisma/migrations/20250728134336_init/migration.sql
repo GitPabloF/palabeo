@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "LangCode" AS ENUM ('fr', 'es', 'en', 'de', 'it', 'pt');
+CREATE TYPE "LangCode" AS ENUM ('fr', 'es', 'en');
 
 -- CreateEnum
 CREATE TYPE "WordTypeCode" AS ENUM ('adj', 'nf', 'nm', 'vi', 'vt', 'adv', 'pron');
@@ -9,6 +9,8 @@ CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "name" TEXT,
+    "userLanguage" "LangCode" NOT NULL DEFAULT 'en',
+    "learnedLanguage" "LangCode" NOT NULL DEFAULT 'es',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -22,10 +24,10 @@ CREATE TABLE "Word" (
     "wordTo" TEXT NOT NULL,
     "exampleFrom" TEXT NOT NULL,
     "exampleTo" TEXT NOT NULL,
-    "langFrom" TEXT NOT NULL,
-    "langTo" TEXT NOT NULL,
+    "langFrom" "LangCode" NOT NULL,
+    "langTo" "LangCode" NOT NULL,
+    "typeCode" "WordTypeCode" NOT NULL,
     "typeName" TEXT NOT NULL,
-    "typeCode" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" TEXT NOT NULL,
     "lastReviewed" TIMESTAMP(3),
