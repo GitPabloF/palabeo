@@ -5,15 +5,16 @@ import { LangCode, Word as WordType } from "@/types/main"
 import WordCard from "@/components/block/wordCard"
 import CardSkeleton from "@/components/ui/cardSkeleton"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
-
-// sample data
-const userLanguage: LangCode = "fr"
-const leanedLanguage: LangCode = "es"
+import { useUser } from "@/contexts/UserContext"
+import { useWords } from "@/hooks/useWords"
 
 export default function Words() {
   const [addedWord, setAddedWord] = useState<[] | WordType[]>([])
   const [translatedWord, setTranslatedWord] = useState<null | WordType>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const { addWord } = useWords()
+
+  const { currentUser } = useUser()
 
   const [addedWordsParent] = useAutoAnimate()
   const [translationParent] = useAutoAnimate()
@@ -22,10 +23,14 @@ export default function Words() {
     setTranslatedWord(word)
   }
 
-  function addWord() {
+  function handleAdd() {
     if (!translatedWord) return
 
-    setAddedWord((prevWords) => [...prevWords, translatedWord])
+    addWord(translatedWord as WordType)
+  }
+
+  if (!currentUser) {
+    return <div>You need to be logged in to add words</div>
   }
 
   return (
@@ -34,9 +39,9 @@ export default function Words() {
         <Add
           displayWord={handleTranslatedWord}
           onLoadingChange={setIsLoading}
-          addWord={addWord}
-          userLanguage={userLanguage}
-          leanedLanguage={leanedLanguage}
+          addWord={handleAdd}
+          userLanguage={currentUser?.userLanguage}
+          leanedLanguage={currentUser?.learnedLanguage}
         />
       </section>
 
