@@ -2,7 +2,7 @@
 CREATE TYPE "LangCode" AS ENUM ('fr', 'es', 'en');
 
 -- CreateEnum
-CREATE TYPE "WordTypeCode" AS ENUM ('adj', 'nf', 'nm', 'vi', 'vt', 'adv', 'pron');
+CREATE TYPE "WordTypeCode" AS ENUM ('adj', 'n', 'nf', 'nm', 'vi', 'vt', 'adv', 'pron');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -26,7 +26,7 @@ CREATE TABLE "Word" (
     "exampleTo" TEXT NOT NULL,
     "langFrom" "LangCode" NOT NULL,
     "langTo" "LangCode" NOT NULL,
-    "typeCode" "WordTypeCode" NOT NULL,
+    "typeCode" TEXT NOT NULL,
     "typeName" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" TEXT NOT NULL,

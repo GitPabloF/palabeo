@@ -47,6 +47,11 @@ export const WORD_TYPE: Record<string, string> = {
   adv: "adverb",
   pron: "pronoun",
   n: "noun",
+  "loc prep": "prepositional phrase",
+  nfpl: "noun feminine plural",
+  nmpl: "noun masculine plural",
+  vti: "verb intransitive",
+  vtt: "verb transitive",
 }
 
 export const LANG: Record<string, Lang> = {

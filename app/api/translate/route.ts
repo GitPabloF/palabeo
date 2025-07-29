@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
-import { formatType } from "@/utilis/formatWord"
+import { formatTypeName } from "@/utilis/formatWord"
 export const runtime = "nodejs"
 
 /**
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
       wordFrom,
       wordTo,
       typeCode: typeCode || "unknown",
-      typeName: formatType(typeCode),
+      typeName: formatTypeName(typeCode),
       langFrom: isReversedLang ? to : from,
       langTo: isReversedLang ? from : to,
       exampleFrom: exampleFrom || null || translation.example?.from?.[0],

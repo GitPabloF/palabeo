@@ -23,8 +23,8 @@ export type Word = {
   id: number
   wordFrom: string
   wordTo: string
-  typeCode: WordTypeCode
-  typeName: String
+  typeCode: string
+  typeName: string
   langFrom: LangCode
   langTo: LangCode
   exampleFrom: string

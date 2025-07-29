@@ -1,11 +1,4 @@
-const typeMap: Record<string, string> = {
-  adj: "adjective",
-  nf: "noun feminine",
-  nm: "noun masculine",
-  vi: "verb intransitive",
-  vt: "verb transitive",
-  adv: "adverb",
-}
+import { WORD_TYPE } from "@/content/main"
 
 /**
  * Format a part-of-speech type from the WordReference API into a normalized label.
@@ -13,7 +6,15 @@ const typeMap: Record<string, string> = {
  * @param type - The raw type string (e.g. "adjective", "noun")
  * @returns A normalized type label (e.g. "adjective", "noun", or "unknown")
  */
-export function formatType(type?: string): string {
+export function formatTypeName(type?: string): string {
   if (!type) return "unknown"
-  return typeMap[type] || type
+  // for (const [code, label] of Object.entries(WORD_TYPE)) {
+  //   if (type.startsWith(code) || code.startsWith(type)) {
+  //     return label
+  //   }
+  // }
+
+  // // If no match found, return the original type
+  // return type
+  return WORD_TYPE[type] || type
 }

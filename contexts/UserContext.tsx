@@ -32,7 +32,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     // for the moment add the default test user
 
     const defaultUser: User = {
-      id: "cmdn5vhti0001v1tpol560amw",
+      id: "cmdopvcgj0000v1ckd5h4x3e9",
       email: "test@example.com",
       name: "Test User",
       userLanguage: "en",
