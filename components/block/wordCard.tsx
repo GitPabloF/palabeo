@@ -92,7 +92,7 @@ export default function WordCard({
       className={`gap-1 relative group rounded-xl shadow-md p-4 transition-all
         ${
           status === "pending" &&
-          "animate-wiggle opacity-70 border-brand-orange border-dashed border-2"
+          "opacity-70 border-brand-orange border-dashed border-2"
         }`}
     >
       <CardHeader className="absolut gap-0">
