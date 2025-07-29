@@ -43,14 +43,14 @@ export default function Vocabulary() {
     return (
       <div className="max-w-[900px] mx-auto pt-20 h-screen pb-5 flex flex-col gap-6">
         <div className="flex justify-center items-center h-full">
-          <p className="text-red-500">Erreur: {error}</p>
+          <p className="text-red-500">Erreur: {error.message}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-[900px] mx-auto pt-20 h-screen pb-5 flex flex-col gap-6">
+    <>
       <div className="flex flex-col flex-1 min-h-0">
         <VocabularyHeader
           searchTerm={searchTerm}
@@ -77,6 +77,6 @@ export default function Vocabulary() {
         pageSize={pageSize}
         index={currentPage}
       />
-    </div>
+    </>
   )
 }

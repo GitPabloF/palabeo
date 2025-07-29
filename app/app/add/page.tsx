@@ -37,7 +37,7 @@ export default function Words() {
   }
 
   return (
-    <div className="max-w-[900px] mx-auto pt-20 h-screen pb-5 flex flex-col gap-6">
+    <>
       <section id="add">
         <Add
           displayWord={handleTranslatedWord}
@@ -69,6 +69,6 @@ export default function Words() {
           </div>
         </section>
       )}
-    </div>
+    </>
   )
 }
