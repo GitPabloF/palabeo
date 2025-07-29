@@ -32,11 +32,36 @@ export async function POST(
       typeCode,
     } = await request.json()
 
-    if (!wordFrom || !wordTo || !langFrom || !langTo) {
+    if (
+      !wordFrom ||
+      !wordTo ||
+      !langFrom ||
+      !langTo ||
+      !typeName ||
+      !typeCode
+    ) {
       return NextResponse.json(
         { error: "Champs requis manquants" },
         { status: 400 }
       )
+    }
+
+    const userWord = await prisma.word.findFirst({
+      where: {
+        wordFrom: {
+          equals: wordFrom,
+          mode: "insensitive",
+        },
+        wordTo: {
+          equals: wordTo,
+          mode: "insensitive",
+        },
+        userId,
+      },
+    })
+
+    if (userWord) {
+      return NextResponse.json({ error: "Already exists" }, { status: 409 })
     }
 
     const word = await prisma.word.create({
@@ -49,7 +74,7 @@ export async function POST(
         langTo,
         typeName,
         typeCode,
-        userId: params.userId,
+        userId: userId,
       },
     })
 
@@ -65,17 +90,18 @@ export async function POST(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    const { userId } = await params
+
     const { searchParams } = new URL(request.url)
     const langFrom = searchParams.get("langFrom")
     const langTo = searchParams.get("langTo")
     const typeCode = searchParams.get("typeCode")
     const mastered = searchParams.get("mastered")
 
-    // Construire les filtres
-    const where: any = { userId: params.userId }
+    const where: any = { userId: userId }
 
     if (langFrom) where.langFrom = langFrom
     if (langTo) where.langTo = langTo
