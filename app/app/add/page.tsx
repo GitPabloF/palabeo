@@ -12,9 +12,9 @@ export default function Words() {
   const [addedWord, setAddedWord] = useState<[] | WordType[]>([])
   const [translatedWord, setTranslatedWord] = useState<null | WordType>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const { addWord } = useWords()
 
   const { currentUser } = useUser()
+  const { addWord, error } = useWords(currentUser?.id)
 
   const [addedWordsParent] = useAutoAnimate()
   const [translationParent] = useAutoAnimate()
@@ -23,10 +23,13 @@ export default function Words() {
     setTranslatedWord(word)
   }
 
-  function handleAdd() {
+  async function handleAdd() {
     if (!translatedWord) return
 
-    addWord(translatedWord as WordType)
+    const result = await addWord(translatedWord)
+    if (result) {
+      setAddedWord((prev) => [...prev, translatedWord])
+    }
   }
 
   if (!currentUser) {
