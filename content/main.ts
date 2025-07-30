@@ -52,6 +52,7 @@ export const WORD_TYPE: Record<string, string> = {
   nmpl: "noun masculine plural",
   vti: "verb intransitive",
   vtt: "verb transitive",
+  "nm, nf": "noun masculine/feminine",
 }
 
 export const LANG: Record<string, Lang> = {

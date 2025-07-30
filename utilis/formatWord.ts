@@ -8,13 +8,5 @@ import { WORD_TYPE } from "@/content/main"
  */
 export function formatTypeName(type?: string): string {
   if (!type) return "unknown"
-  // for (const [code, label] of Object.entries(WORD_TYPE)) {
-  //   if (type.startsWith(code) || code.startsWith(type)) {
-  //     return label
-  //   }
-  // }
-
-  // // If no match found, return the original type
-  // return type
   return WORD_TYPE[type] || type
 }
