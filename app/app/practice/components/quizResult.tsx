@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { RotateCcw, Trophy, Target, BookOpen } from "lucide-react"
+import { RotateCcw, Trophy, Target, BookOpen, Star } from "lucide-react"
 
 import WordCard from "@/components/block/wordCard"
 import type { Word } from "@/types/main"
@@ -29,42 +29,38 @@ export default function QuizResult({
     if (percentage >= 90) {
       return {
         emoji: "🎉",
-        title: "Excellent !",
-        subtitle: "Tu as vraiment bien réussi !",
+        title: "Fantastic !",
+        subtitle: "You are a true champion !",
         color: "text-green-600",
         bgColor: "bg-green-50",
         icon: Trophy,
-        message: "Continue comme ça, tu progresses vraiment bien !",
       }
     } else if (percentage >= 70) {
       return {
         emoji: "👏",
-        title: "Bien joué !",
-        subtitle: "Tu t'en sors plutôt bien !",
+        title: "Well done !",
+        subtitle: "You are doing very well !",
         color: "text-blue-600",
         bgColor: "bg-blue-50",
         icon: Target,
-        message: "Quelques erreurs, mais dans l'ensemble c'est solide !",
       }
     } else if (percentage >= 50) {
       return {
         emoji: "💪",
-        title: "Pas mal !",
-        subtitle: "Tu peux faire mieux !",
+        title: "Not bad at all !",
+        subtitle: "You are on the right track !",
         color: "text-orange-600",
         bgColor: "bg-orange-50",
         icon: BookOpen,
-        message: "Continue à pratiquer, tu vas y arriver !",
       }
     } else {
       return {
         emoji: "📚",
-        title: "Pas de panique !",
-        subtitle: "C'est normal de faire des erreurs",
+        title: "No stress !",
+        subtitle: "Each mistake is an opportunity to learn",
         color: "text-purple-600",
         bgColor: "bg-purple-50",
         icon: BookOpen,
-        message: "Chaque erreur est une occasion d'apprendre !",
       }
     }
   }
@@ -75,7 +71,7 @@ export default function QuizResult({
   return (
     <div className="space-y-6">
       {/* Score Card */}
-      <Card className="text-center">
+      <Card className="text-center shadow-xl border-0 bg-gradient-to-br from-white to-gray-50/50">
         <CardContent className="pt-8 pb-6">
           <div className="flex justify-center mb-4">
             <div className={`p-4 rounded-full ${resultData.bgColor}`}>
@@ -104,11 +100,7 @@ export default function QuizResult({
           </div>
 
           <p className="text-sm text-muted-foreground mb-6">
-            {percentage}% de réussite
-          </p>
-
-          <p className="text-base text-foreground mb-6 max-w-md mx-auto">
-            {resultData.message}
+            {percentage}% of success
           </p>
 
           {onRestart && (
@@ -125,12 +117,12 @@ export default function QuizResult({
         <div className="space-y-4">
           <div className="text-center">
             <h2 className="text-xl font-semibold text-foreground mb-2">
-              📝 Les mots à revoir
+              📝 Words to review
             </h2>
             <p className="text-sm text-muted-foreground">
               {wrongWordsData.length === 1
-                ? "Voici le mot que tu as manqué :"
-                : `Voici les ${wrongWordsData.length} mots que tu as manqués :`}
+                ? "Here is the word you missed :"
+                : `Here are the ${wrongWordsData.length} words you missed :`}
             </p>
           </div>
 

@@ -7,6 +7,8 @@ import CardSkeleton from "@/components/ui/cardSkeleton"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useUser } from "@/contexts/UserContext"
 import { useWords } from "@/hooks/useWords"
+import { Plus, Sparkles } from "lucide-react"
+import PageHeader from "@/components/ui/pageHeader"
 
 export default function Words() {
   const [addedWord, setAddedWord] = useState<[] | WordType[]>([])
@@ -38,7 +40,14 @@ export default function Words() {
 
   return (
     <>
-      <section id="add">
+      <PageHeader
+        title="Add a word"
+        description="Type a word and discover its translation ! You can then add it to your vocabulary to review it later."
+        leftIcon={Plus}
+      />
+
+      {/* Add Word Form */}
+      <section id="add" className="mb-8">
         <Add
           displayWord={handleTranslatedWord}
           onLoadingChange={setIsLoading}
@@ -48,7 +57,8 @@ export default function Words() {
         />
       </section>
 
-      <div ref={translationParent}>
+      {/* Translation Preview */}
+      <div ref={translationParent} className="mb-8">
         {isLoading ? (
           <CardSkeleton />
         ) : (
@@ -56,9 +66,13 @@ export default function Words() {
         )}
       </div>
 
+      {/* Recently Added Words */}
       {addedWord.length > 0 && (
-        <section className="mt-8">
-          <h3 className="text-lg font-bold mb-4">Mots ajoutés récemment :</h3>
+        <section className="space-y-4">
+          <h3 className="text-xl font-semibold mb-2 text-center text-slate-700">
+            Recently added words:
+          </h3>
+
           <div ref={addedWordsParent} className="flex flex-col gap-4">
             {addedWord
               .slice(-3)

@@ -5,6 +5,8 @@ import { useQuizGame } from "@/hooks/useQuizGame"
 import type { Question } from "@/types/main"
 import { useUser } from "@/contexts/UserContext"
 import { useWords } from "@/hooks/useWords"
+import { Brain, Sparkles } from "lucide-react"
+import PageHeader from "@/components/ui/pageHeader"
 
 const sampleQuestions: Question[] = [
   {
@@ -110,22 +112,34 @@ export default function PracticePage() {
 
   if (isGameComplete) {
     return (
-      <QuizResult
-        score={score}
-        totalQuestions={totalQuestions}
-        wrongWordsData={wrongWordsData}
-      />
+      <div className="max-w-[900px] mx-auto pt-8 pb-8 px-4">
+        <QuizResult
+          score={score}
+          totalQuestions={totalQuestions}
+          wrongWordsData={wrongWordsData}
+        />
+      </div>
     )
   }
 
   return (
     <>
-      <QuizCard
-        key={questionIndex}
-        {...currentQuestion}
-        totalQuestions={totalQuestions}
-        nextQuestion={handleNextQuestion}
+      <PageHeader
+        title="Quiz Challenge"
+        description="Test your knowledge! Choose the correct translation before time runs out.."
+        leftIcon={Brain}
+        rightIcon={Sparkles}
       />
+
+      {/* Quiz Card */}
+      <div className="flex justify-center">
+        <QuizCard
+          key={questionIndex}
+          {...currentQuestion}
+          totalQuestions={totalQuestions}
+          nextQuestion={handleNextQuestion}
+        />
+      </div>
     </>
   )
 }
