@@ -268,8 +268,8 @@ function SidebarTrigger({
       variant="ghost"
       size="icon"
       className={cn(
-        "z-50 size-8 bg-background/80 backdrop-blur-sm border border-border shadow-lg hover:bg-background/90 transition-all duration-200",
-        "md:top-6 md:left-6 m-2",
+        "sticky top-2 left-4 z-50 size-8 bg-background/80 backdrop-blur-sm border border-border shadow-lg hover:bg-background/90 transition-all duration-200",
+        "md:top-2 md:left-6",
         className
       )}
       onClick={(event) => {
@@ -278,7 +278,7 @@ function SidebarTrigger({
       }}
       {...props}
     >
-      <Menu className="size-4 text-foreground m-4" />
+      <Menu className="size-4 text-foreground" />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )

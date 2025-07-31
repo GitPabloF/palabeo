@@ -14,7 +14,7 @@ export function VocabularyHeader({
   onSearchChange,
 }: VocabularyHeaderProps) {
   return (
-    <div className="flex justify-between items-center mb-6 px-10">
+    <div className="flex justify-between items-center">
       <h2 className="text-2xl font-bold">My Vocabulary</h2>
       <div className="flex gap-2">
         <div className="relative text-gray-400">

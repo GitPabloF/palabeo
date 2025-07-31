@@ -1,4 +1,3 @@
-// import AppNav from "@/app/app/components/appNav"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import AppSidebar from "@/app/app/components/appSidebar"
 import { UserProvider } from "@/contexts/UserContext"
@@ -8,10 +7,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <UserProvider>
       <SidebarProvider>
         <AppSidebar />
-        <main className="bg-gray-100 flex h-screen w-screen">
-          <SidebarTrigger />
-          <div className="flex-1 max-w-[900px] mx-auto pt-20 h-screen pb-5 flex flex-col gap-6">
-            {children}
+        <main className="relative bg-gray-100 min-h-screen w-screen flex-1 flex">
+          <div className="flex-1  min-h-screen pb-5 flex flex-col gap-6 mx-10 py-8">
+            <SidebarTrigger />
+            <div className="max-w-[900px] w-full items-center flex-1 self-center">
+              {children}
+            </div>
           </div>
         </main>
       </SidebarProvider>

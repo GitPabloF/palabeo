@@ -98,36 +98,34 @@ export default function PracticePage() {
   const { currentUser } = useUser()
   const { words } = useWords(currentUser?.id)
 
-  // const {
-  //   currentQuestion,
-  //   score,
-  //   totalQuestions,
-  //   isGameComplete,
-  //   questionIndex,
-  //   handleNextQuestion,
-  //   wrongWordsData,
-  // } = useQuizGame(sampleQuestions, words)
+  const {
+    currentQuestion,
+    score,
+    totalQuestions,
+    isGameComplete,
+    questionIndex,
+    handleNextQuestion,
+    wrongWordsData,
+  } = useQuizGame(sampleQuestions, words)
 
   if (isGameComplete) {
     return (
-      // <QuizResult
-      //   score={score}
-      //   totalQuestions={totalQuestions}
-      //   wrongWordsData={wrongWordsData}
-      // />
-      <QuizResult {...sampleTest} />
+      <QuizResult
+        score={score}
+        totalQuestions={totalQuestions}
+        wrongWordsData={wrongWordsData}
+      />
     )
   }
 
   return (
-    // <>
-    //   <QuizCard
-    //     key={questionIndex}
-    //     {...currentQuestion}
-    //     totalQuestions={totalQuestions}
-    //     nextQuestion={handleNextQuestion}
-    //   />
-    // </>
-    <p>test</p>
+    <>
+      <QuizCard
+        key={questionIndex}
+        {...currentQuestion}
+        totalQuestions={totalQuestions}
+        nextQuestion={handleNextQuestion}
+      />
+    </>
   )
 }

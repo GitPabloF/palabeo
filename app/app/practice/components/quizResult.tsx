@@ -136,7 +136,7 @@ export default function QuizResult({
 
           <Separator />
 
-          <ScrollArea className="h-[400px] rounded-xl border p-4">
+          <ScrollArea className="flex-1">
             <div className="space-y-4">
               {wrongWordsData.map((word) => (
                 <WordCard key={word.id} {...word} showAllTranslation={true} />

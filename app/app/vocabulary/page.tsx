@@ -51,7 +51,7 @@ export default function Vocabulary() {
 
   return (
     <>
-      <div className="flex flex-col flex-1 min-h-0">
+      <div className="h-[90vh] flex flex-col overflow-hidden gap-6">
         <VocabularyHeader
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
@@ -62,21 +62,23 @@ export default function Vocabulary() {
           onShowTranslationChange={setShowAllTranslation}
         />
 
-        <ScrollArea className="flex-1 flex px-10 mt-7 h-72 rounded-2xl">
-          <VocabularyList
-            words={paginatedItems}
-            loading={loading}
-            onDelete={handleDelete}
-            showAllTranslation={showAllTranslation}
-          />
-        </ScrollArea>
-      </div>
+        <div className="flex-1 min-h-0">
+          <ScrollArea className="h-full rounded-2xl">
+            <VocabularyList
+              words={paginatedItems}
+              loading={loading}
+              onDelete={handleDelete}
+              showAllTranslation={showAllTranslation}
+            />
+          </ScrollArea>
+        </div>
 
-      <CustomPagination
-        length={filteredItems.length}
-        pageSize={pageSize}
-        index={currentPage}
-      />
+        <CustomPagination
+          length={filteredItems.length}
+          pageSize={pageSize}
+          index={currentPage}
+        />
+      </div>
     </>
   )
 }
