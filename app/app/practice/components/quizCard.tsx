@@ -27,11 +27,22 @@ export default function QuizCard({
   >("playing")
   const [selectedValue, setSelectedValue] = useState<string | null>(null)
 
+  /**
+   * Handle the completion of the game
+   * @returns void
+   */
   function handleCompleted() {
     setStatus("timeout")
     nextQuestion(false)
   }
 
+  /**
+   * Handle the choice of the user
+   * if the choice is correct, set the status to correct and call the nextQuestion function with true
+   * if the choice is incorrect, set the status to wrong and call the nextQuestion function with false
+   * @param choice - The choice of the user
+   * @returns void
+   */
   function handleChoice(choice: string) {
     if (!choice || status !== "playing") return
 
@@ -46,6 +57,11 @@ export default function QuizCard({
     }
   }
 
+  /**
+   * Set the color of the button based on the status of the game
+   * @param option - The option of the user
+   * @returns string
+   */
   function setColor(option: string) {
     if (status === "correct" && option === answer) {
       return "bg-green-500 text-white hover:bg-green-600 hover:text-white"

@@ -31,3 +31,10 @@ export type Word = {
   exampleTo: string
   createdAt: string | Date
 }
+
+export type Question = {
+  questionNumber: number
+  word: string
+  answer: string
+  options: string[]
+}

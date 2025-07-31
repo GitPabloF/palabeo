@@ -1,14 +1,9 @@
 "use client"
-import { useState, useEffect } from "react"
 import QuizCard from "./components/quizCard"
 import QuizResult from "./components/quizResult"
+import { useQuizGame } from "@/hooks/useQuizGame"
+import type { Question } from "@/types/main"
 
-type Question = {
-  questionNumber: number
-  word: string
-  answer: string
-  options: string[]
-}
 const sampleQuestions: Question[] = [
   {
     questionNumber: 1,
@@ -49,47 +44,27 @@ const sampleQuestions: Question[] = [
 ]
 
 export default function PracticePage() {
-  const totalQuestions = sampleQuestions.length
+  const {
+    currentQuestion,
+    score,
+    totalQuestions,
+    isGameComplete,
+    questionIndex,
+    handleNextQuestion,
+  } = useQuizGame(sampleQuestions)
 
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-  const [currentQuestion, setCurrentQuestion] = useState<Question>(
-    sampleQuestions[currentQuestionIndex]
-  )
-
-  const [score, setScore] = useState(0)
-  const [status, setStatus] = useState("practice")
-  function handleNextQuestion(correct: boolean) {
-    // wait 1 second before showing the next question
-    setTimeout(() => {
-      const nextIndex = currentQuestionIndex + 1
-      setCurrentQuestionIndex(nextIndex)
-      if (correct) {
-        setScore(score + 1)
-      }
-    }, 1000)
+  if (isGameComplete) {
+    return <QuizResult score={score} totalQuestions={totalQuestions} />
   }
-
-  useEffect(() => {
-    if (currentQuestionIndex < totalQuestions) {
-      setCurrentQuestion(sampleQuestions[currentQuestionIndex])
-    } else {
-      //show the result
-      setStatus("result")
-    }
-  }, [currentQuestionIndex])
 
   return (
     <>
-      {status === "practice" ? (
-        <QuizCard
-          key={currentQuestionIndex}
-          {...currentQuestion}
-          totalQuestions={totalQuestions}
-          nextQuestion={handleNextQuestion}
-        />
-      ) : (
-        <QuizResult score={score} totalQuestions={totalQuestions} />
-      )}
+      <QuizCard
+        key={questionIndex}
+        {...currentQuestion}
+        totalQuestions={totalQuestions}
+        nextQuestion={handleNextQuestion}
+      />
     </>
   )
 }
