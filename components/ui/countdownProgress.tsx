@@ -53,10 +53,5 @@ export default function CountdownProgress({
     }
   }, [canPlay, duration, onComplete])
 
-  return (
-    <>
-      <p>canPlay: {canPlay}</p>
-      <Progress value={value} />
-    </>
-  )
+  return <Progress value={value} />
 }

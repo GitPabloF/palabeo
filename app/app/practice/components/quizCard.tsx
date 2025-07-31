@@ -11,6 +11,7 @@ type QuizCardProps = {
   totalQuestions: number
   answer: string
   options: string[]
+  nextQuestion: (correct: boolean) => void
 }
 
 export default function QuizCard({
@@ -19,15 +20,16 @@ export default function QuizCard({
   totalQuestions,
   answer,
   options,
+  nextQuestion,
 }: QuizCardProps) {
   const [status, setStatus] = useState<
     "playing" | "wrong" | "correct" | "timeout"
   >("playing")
   const [selectedValue, setSelectedValue] = useState<string | null>(null)
-  // const [canPlay, setCanPlay] = useState(true)
 
   function handleCompleted() {
     setStatus("timeout")
+    nextQuestion(false)
   }
 
   function handleChoice(choice: string) {
@@ -37,8 +39,10 @@ export default function QuizCard({
 
     if (choice === answer) {
       setStatus("correct")
+      nextQuestion(true)
     } else {
       setStatus("wrong")
+      nextQuestion(false)
     }
   }
 
@@ -52,14 +56,11 @@ export default function QuizCard({
     return "text-black"
   }
 
-  //  const colorClasses =
-  // if (!canPlay) return <div>Time out !</div>
-
   return (
     <Card className="gap-15">
       <CardContent className="flex justify-between items-center">
         <span className="inline-block">
-          Question {questionNumber} of {totalQuestions} - {status}
+          Question {questionNumber} of {totalQuestions}
         </span>
         <div className="w-2/5 max-w-80">
           <CountdownProgress

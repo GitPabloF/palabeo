@@ -1,6 +1,15 @@
+"use client"
+import { useState, useEffect } from "react"
 import QuizCard from "./components/quizCard"
+import QuizResult from "./components/quizResult"
 
-const sampleQuestions = [
+type Question = {
+  questionNumber: number
+  word: string
+  answer: string
+  options: string[]
+}
+const sampleQuestions: Question[] = [
   {
     questionNumber: 1,
     word: "Falda",
@@ -41,17 +50,46 @@ const sampleQuestions = [
 
 export default function PracticePage() {
   const totalQuestions = sampleQuestions.length
-  const currentQuestion = sampleQuestions[3]
+
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+  const [currentQuestion, setCurrentQuestion] = useState<Question>(
+    sampleQuestions[currentQuestionIndex]
+  )
+
+  const [score, setScore] = useState(0)
+  const [status, setStatus] = useState("practice")
+  function handleNextQuestion(correct: boolean) {
+    // wait 1 second before showing the next question
+    setTimeout(() => {
+      const nextIndex = currentQuestionIndex + 1
+      setCurrentQuestionIndex(nextIndex)
+      if (correct) {
+        setScore(score + 1)
+      }
+    }, 1000)
+  }
+
+  useEffect(() => {
+    if (currentQuestionIndex < totalQuestions) {
+      setCurrentQuestion(sampleQuestions[currentQuestionIndex])
+    } else {
+      //show the result
+      setStatus("result")
+    }
+  }, [currentQuestionIndex])
 
   return (
     <>
-      <QuizCard
-        word={currentQuestion.word}
-        questionNumber={currentQuestion.questionNumber}
-        totalQuestions={totalQuestions}
-        answer={currentQuestion.answer}
-        options={currentQuestion.options}
-      />
+      {status === "practice" ? (
+        <QuizCard
+          key={currentQuestionIndex}
+          {...currentQuestion}
+          totalQuestions={totalQuestions}
+          nextQuestion={handleNextQuestion}
+        />
+      ) : (
+        <QuizResult score={score} totalQuestions={totalQuestions} />
+      )}
     </>
   )
 }
