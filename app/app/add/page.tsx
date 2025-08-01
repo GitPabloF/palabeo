@@ -2,7 +2,7 @@
 import Add from "@/components/block/add"
 import { useState } from "react"
 import { LangCode, Word as WordType } from "@/types/main"
-import WordCard from "@/components/block/wordCard"
+import WordCard from "@/components/block/wordCard/wordCard"
 import CardSkeleton from "@/components/ui/cardSkeleton"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useUser } from "@/contexts/UserContext"
@@ -73,13 +73,21 @@ export default function Words() {
             Recently added words:
           </h3>
 
-          <div ref={addedWordsParent} className="flex flex-col gap-4">
+          <div
+            ref={addedWordsParent}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          >
             {addedWord
               .slice(-3)
               .reverse()
               .map((word) => (
                 <WordCard key={word.id} {...word} />
               ))}
+            {translatedWord && (
+              <div className="col-span-1 md:col-span-2 lg:col-span-3">
+                <WordCard {...translatedWord} status="pending" />
+              </div>
+            )}
           </div>
         </section>
       )}

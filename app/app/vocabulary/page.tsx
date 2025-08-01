@@ -51,7 +51,7 @@ export default function Vocabulary() {
 
   return (
     <>
-      <div className="h-[90vh] flex flex-col overflow-hidden gap-6">
+      <div className="flex flex-col gap-6">
         <VocabularyHeader
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}

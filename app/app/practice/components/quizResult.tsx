@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { RotateCcw, Trophy, Target, BookOpen, Star } from "lucide-react"
 
-import WordCard from "@/components/block/wordCard"
+import WordCard from "@/components/block/wordCard/wordCard"
 import type { Word } from "@/types/main"
 import { Card, CardContent } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
