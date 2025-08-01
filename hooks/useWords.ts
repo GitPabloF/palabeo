@@ -97,7 +97,7 @@ export function useWords(userId?: string) {
         return false
       }
 
-      const newWord = await response.json()
+      const { word: newWord } = await response.json()
       setWords((prev) => [...prev, newWord])
       return true
     } catch (error) {

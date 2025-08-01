@@ -1,13 +1,13 @@
-import { Word } from "@/lib/generated/prisma"
+import { Word } from "@/types/main"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import WordCard from "@/components/block/wordCard/wordCard"
 import CardSkeleton from "@/components/ui/cardSkeleton"
 
 interface VocabularyListProps {
   words: Word[]
-  loading: boolean
-  onDelete: (id: number) => void
-  showAllTranslation: boolean
+  loading?: boolean
+  onDelete?: (id: number) => void
+  showAllTranslation?: boolean
 }
 
 export function VocabularyList({

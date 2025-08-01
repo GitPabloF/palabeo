@@ -1,37 +1,30 @@
 "use client"
 import Add from "@/components/block/add"
 import { useState } from "react"
-import { LangCode, Word as WordType } from "@/types/main"
-import WordCard from "@/components/block/wordCard/wordCard"
-import CardSkeleton from "@/components/ui/cardSkeleton"
-import { useAutoAnimate } from "@formkit/auto-animate/react"
+import { Word } from "@/types/main"
 import { useUser } from "@/contexts/UserContext"
 import { useWords } from "@/hooks/useWords"
-import { Plus, Sparkles } from "lucide-react"
+import { Plus } from "lucide-react"
 import PageHeader from "@/components/ui/pageHeader"
+import { VocabularyList } from "@/components/vocabulary/VocabularyList"
 
 export default function Words() {
-  const [addedWord, setAddedWord] = useState<[] | WordType[]>([])
-  const [translatedWord, setTranslatedWord] = useState<null | WordType>(null)
+  const [translatedWord, setTranslatedWord] = useState<null | Word>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   const { currentUser } = useUser()
-  const { addWord, error } = useWords(currentUser?.id)
+  const { addWord, words, loading } = useWords(currentUser?.id)
 
-  const [addedWordsParent] = useAutoAnimate()
-  const [translationParent] = useAutoAnimate()
-
-  function handleTranslatedWord(word: WordType | null) {
+  function handleTranslatedWord(word: Word | null) {
     setTranslatedWord(word)
   }
+
+  const recentlyAddedWords = words.slice(-3).reverse()
 
   async function handleAdd() {
     if (!translatedWord) return
 
-    const result = await addWord(translatedWord)
-    if (result) {
-      setAddedWord((prev) => [...prev, translatedWord])
-    }
+    await addWord(translatedWord)
   }
 
   if (!currentUser) {
@@ -58,37 +51,22 @@ export default function Words() {
       </section>
 
       {/* Translation Preview */}
-      <div ref={translationParent} className="mb-8">
-        {isLoading ? (
-          <CardSkeleton />
-        ) : (
-          translatedWord && <WordCard {...translatedWord} status="pending" />
-        )}
-      </div>
+      {translatedWord && (
+        <VocabularyList
+          words={[translatedWord]}
+          loading={isLoading}
+          showAllTranslation={true}
+        />
+      )}
 
       {/* Recently Added Words */}
-      {addedWord.length > 0 && (
+      {words.length > 0 && (
         <section className="space-y-4">
           <h3 className="text-xl font-semibold mb-2 text-center text-slate-700">
             Recently added words:
           </h3>
 
-          <div
-            ref={addedWordsParent}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-          >
-            {addedWord
-              .slice(-3)
-              .reverse()
-              .map((word) => (
-                <WordCard key={word.id} {...word} />
-              ))}
-            {translatedWord && (
-              <div className="col-span-1 md:col-span-2 lg:col-span-3">
-                <WordCard {...translatedWord} status="pending" />
-              </div>
-            )}
-          </div>
+          <VocabularyList words={recentlyAddedWords} loading={loading} />
         </section>
       )}
     </>
