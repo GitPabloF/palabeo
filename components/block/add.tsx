@@ -8,6 +8,7 @@ import { z } from "zod"
 import { Button } from "@/components/ui/button"
 import { LangCode, Word } from "@/types/main"
 import { LANG } from "@/content/main"
+import { getFlagURL } from "@/utils/getFlag"
 
 import {
   Form,
@@ -42,12 +43,6 @@ export default function Add({
   const [error, setError] = useState<string | null>(null)
   const [translatedWord, setTranslatedWord] = useState<null | Word>(null)
   const [isReversedLang, setIsReversedLang] = useState(false)
-
-  const flagURL = (lang: LangCode) => {
-    let langCode = lang.toUpperCase()
-    if (langCode === "EN") langCode = "US"
-    return `http://purecatamphetamine.github.io/country-flag-icons/3x2/${langCode}.svg`
-  }
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -134,7 +129,7 @@ export default function Add({
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2">
                         <img
-                          src={flagURL(fromLang)}
+                          src={getFlagURL(fromLang)}
                           alt={fromLang}
                           className="w-5 h-5"
                         />

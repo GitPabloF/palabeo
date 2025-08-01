@@ -1,6 +1,6 @@
 import { Word } from "@/lib/generated/prisma"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
-import WordCard from "@/components/block/wordCard"
+import WordCard from "@/components/block/wordCard/wordCard"
 import CardSkeleton from "@/components/ui/cardSkeleton"
 
 interface VocabularyListProps {
@@ -40,7 +40,10 @@ export function VocabularyList({
   }
 
   return (
-    <div className="flex-1 flex flex-col gap-5" ref={parent}>
+    <div
+      className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+      ref={parent}
+    >
       {words.map((word) => (
         <WordCard
           key={word.id}

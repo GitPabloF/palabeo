@@ -5,7 +5,7 @@ import {
   formatTypeCode,
   formatWord,
   formatExemple,
-} from "@/utilis/formatWord"
+} from "@/utils/formatWord"
 export const runtime = "nodejs"
 
 /**
