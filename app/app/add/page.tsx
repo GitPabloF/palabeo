@@ -19,7 +19,7 @@ export default function Words() {
     setTranslatedWord(word)
   }
 
-  const recentlyAddedWords = words.slice(-3).reverse()
+  const recentlyAddedWords = words.slice(-6).reverse()
 
   async function handleAdd() {
     if (!translatedWord) return
@@ -50,19 +50,10 @@ export default function Words() {
         />
       </section>
 
-      {/* Translation Preview */}
-      {translatedWord && (
-        <VocabularyList
-          words={[translatedWord]}
-          loading={isLoading}
-          showAllTranslation={true}
-        />
-      )}
-
       {/* Recently Added Words */}
       {words.length > 0 && (
         <section className="space-y-4">
-          <h3 className="text-xl font-semibold mb-2 text-center text-slate-700">
+          <h3 className="text-xl font-semibold mb-2 text-center text-slate-700 mb-4">
             Recently added words:
           </h3>
 

@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button"
 import { LangCode, Word } from "@/types/main"
 import { LANG } from "@/content/main"
 import { getFlagURL } from "@/utils/getFlag"
+import WordCard from "@/components/block/wordCard/wordCard"
+import CardSkeleton from "@/components/ui/cardSkeleton"
+import { useAutoAnimate } from "@formkit/auto-animate/react"
 
 import {
   Form,
@@ -43,6 +46,8 @@ export default function Add({
   const [error, setError] = useState<string | null>(null)
   const [translatedWord, setTranslatedWord] = useState<null | Word>(null)
   const [isReversedLang, setIsReversedLang] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [parent] = useAutoAnimate()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -59,6 +64,7 @@ export default function Add({
       setTranslatedWord(null)
       if (watchedWord && watchedWord.length > 2) {
         try {
+          setIsLoading(true)
           onLoadingChange?.(true)
           const response = await fetch(
             `/api/translate?word=${encodeURIComponent(
@@ -66,18 +72,24 @@ export default function Add({
             )}&from=${fromLang}&to=${toLang}&isReversedLang=${isReversedLang}`
           )
           if (!response.ok) {
+            setIsLoading(false)
             onLoadingChange?.(false)
             setError("an error has ocurred")
             return
           }
           const json = await response.json()
+          setIsLoading(false)
           onLoadingChange?.(false)
           const newWord: Word = json.data
           setTranslatedWord(newWord)
         } catch (error) {
+          setIsLoading(false)
           onLoadingChange?.(false)
           console.error("Translation error:", error)
         }
+      } else {
+        setIsLoading(false)
+        onLoadingChange?.(false)
       }
     }
     const timerId = setTimeout(() => {
@@ -85,11 +97,11 @@ export default function Add({
     }, 500)
 
     return () => clearTimeout(timerId)
-  }, [watchedWord, form])
+  }, [watchedWord, form, fromLang, toLang, isReversedLang, onLoadingChange])
 
   useEffect(() => {
     displayWord(translatedWord)
-  }, [translatedWord])
+  }, [translatedWord, displayWord])
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     form.reset()
@@ -97,6 +109,7 @@ export default function Add({
 
   function resetForm() {
     form.reset()
+    setTranslatedWord(null)
   }
 
   function toggleDirection() {
@@ -147,7 +160,7 @@ export default function Add({
               )}
             />
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4" ref={parent}>
               <Button
                 type="button"
                 variant="ghost"
@@ -161,6 +174,23 @@ export default function Add({
                   <span className="font-medium">{toLang.toUpperCase()}</span>
                 </span>
               </Button>
+
+              {/* Translation Preview */}
+              {isLoading && (
+                <div className="py-4 flex justify-center">
+                  <div className="w-full max-w-sm">
+                    <CardSkeleton />
+                  </div>
+                </div>
+              )}
+
+              {translatedWord && (
+                <div className="py-4 flex justify-center">
+                  <div className="w-full max-w-[280px]">
+                    <WordCard {...translatedWord} status="pending" />
+                  </div>
+                </div>
+              )}
 
               <div className="flex gap-3 w-full">
                 <Button

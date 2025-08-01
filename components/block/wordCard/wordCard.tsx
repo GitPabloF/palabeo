@@ -51,8 +51,8 @@ export default function WordCard({
   return (
     <div
       ref={parent}
-      className={`relative w-full h-96 perspective-1000 ${
-        status === "pending" && "opacity-70"
+      className={`relative w-full h-100 perspective-1000 ${
+        status === "pending" && "animate-wiggle"
       }`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
