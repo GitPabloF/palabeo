@@ -70,7 +70,7 @@ export const WORD_TYPE: Record<string, { name: string; associated: string[] }> =
     },
     n: {
       name: "noun",
-      associated: ["n"],
+      associated: ["n", "n amb"],
     },
     vi: {
       name: "verb",
