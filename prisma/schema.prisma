@@ -52,14 +52,3 @@ enum LangCode {
   es
   en
 }
-
-enum WordTypeCode {
-  adj
-  n
-  nf
-  nm
-  vi
-  vt
-  adv
-  pron
-}

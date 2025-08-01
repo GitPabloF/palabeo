@@ -8,7 +8,7 @@ import { useAutoAnimate } from "@formkit/auto-animate/react"
 
 import { getDaysAgo } from "@/utilis/formatDate"
 import AppAlertDialog from "@/app/app/components/appAlertDialog"
-import ShowButton from "../ui/showButton"
+import { getFlagURL } from "@/utils/getFlag"
 
 // TODO: add onEdit
 type WordCardProps = WordType & {
@@ -33,124 +33,214 @@ export default function WordCard({
   showAllTranslation,
 }: WordCardProps) {
   const [parent] = useAutoAnimate()
-
-  const [showTranslation, setShowTranslation] = useState(true)
-
-  const displayTranslation = showTranslation || status === "pending"
-
-  const flagURL = (lang: LangCode) =>
-    `http://purecatamphetamine.github.io/country-flag-icons/3x2/${lang.toUpperCase()}.svg`
+  const [isFlipped, setIsFlipped] = useState(false)
 
   useEffect(() => {
     if (status === "added" && showAllTranslation !== undefined) {
-      setShowTranslation(showAllTranslation)
+      setIsFlipped(showAllTranslation)
     }
   }, [showAllTranslation])
 
-  const typeColor: Record<WordTypeCode, { bg: string; text: string }> = {
+  const typeColor: Record<
+    WordTypeCode,
+    { bg: string; text: string; border: string }
+  > = {
     verb: {
-      bg: "text-blue-600",
-      text: "bg-blue-100",
+      bg: "bg-gradient-to-br from-blue-500 to-blue-600",
+      text: "text-white",
+      border: "border-blue-400",
     },
     nf: {
-      bg: "text-yellow-600",
-      text: "bg-yellow-100",
+      bg: "bg-gradient-to-br from-yellow-500 to-yellow-600",
+      text: "text-white",
+      border: "border-yellow-400",
     },
     nm: {
-      bg: "text-yellow-600",
-      text: "bg-yellow-100",
+      bg: "bg-gradient-to-br from-yellow-500 to-yellow-600",
+      text: "text-white",
+      border: "border-yellow-400",
     },
     adj: {
-      bg: "text-purple-600",
-      text: "bg-purple-100",
+      bg: "bg-gradient-to-br from-purple-500 to-purple-600",
+      text: "text-white",
+      border: "border-purple-400",
     },
     vi: {
-      bg: "text-green-600",
-      text: "bg-green-100",
+      bg: "bg-gradient-to-br from-green-500 to-green-600",
+      text: "text-white",
+      border: "border-green-400",
     },
     vt: {
-      bg: "text-green-600",
-      text: "bg-green-100",
+      bg: "bg-gradient-to-br from-green-500 to-green-600",
+      text: "text-white",
+      border: "border-green-400",
     },
     adv: {
-      bg: "text-violet-600",
-      text: "bg-violet-100",
+      bg: "bg-gradient-to-br from-violet-500 to-violet-600",
+      text: "text-white",
+      border: "border-violet-400",
     },
     pron: {
-      bg: "text-pink-600",
-      text: "bg-pink-100",
+      bg: "bg-gradient-to-br from-pink-500 to-pink-600",
+      text: "text-white",
+      border: "border-pink-400",
     },
   }
 
   function getTypeColors(type: keyof typeof typeColor) {
-    return typeColor[type] ?? { bg: "text-gray-600", text: "bg-gray-100" }
+    return (
+      typeColor[type] ?? {
+        bg: "bg-gradient-to-br from-gray-500 to-gray-600",
+        text: "text-white",
+        border: "border-gray-400",
+      }
+    )
   }
 
-  return (
-    <Card
-      ref={parent}
-      className={`gap-1 relative group rounded-xl shadow-md p-4 transition-all
-        ${
-          status === "pending" &&
-          "opacity-70 border-brand-orange border-dashed border-2"
-        }`}
-    >
-      <CardHeader className="absolut gap-0">
-        {/* action buttons */}
-        <CardAction className="text-gray-400 absolute transition-opacity duration-200 ease-in-out opacity-0 group-hover:opacity-100 ">
-          {status === "added" && (
-            <AppAlertDialog
-              title="Delete this word?"
-              description="This word will be permanently removed from your list. This action cannot be undone."
-              onConfirm={() => onDelete?.(id)}
-            >
-              <button className="px-1 py-1 hover:text-gray-700 cursor-pointer">
-                <Trash size={20} />
-              </button>
-            </AppAlertDialog>
-          )}
-        </CardAction>
-      </CardHeader>
-      {/* word */}
-      <CardContent>
-        <span
-          className={`py-1 px-1.5 ${getTypeColors(typeCode).bg} ${
-            getTypeColors(typeCode).text
-          } text-xs font-bold rounded-2xl mb-1 inline-block capitalize`}
-        >
-          {typeName}
-        </span>
-        <div className="flex items-center gap-2">
-          <span className="text-lg font-bold capitalize">{wordTo}</span>
-          <img src={flagURL(langTo)} alt={langTo} className="w-5 h-5" />
-        </div>
-        {exampleTo && <p className="italic mt-0.5">"{exampleTo}"</p>}
-      </CardContent>
+  const colors = getTypeColors(typeCode)
 
-      {/* translation */}
-      <CardContent className="flex gap-2 mt-4 flex-col">
-        <Separator />
-        <div ref={parent}>
-          {displayTranslation && (
-            <div className="flex flex-col pb-1.5">
-              <span className="text-lg font-bold capitalize text-slate-400">
-                {wordFrom}
-              </span>
-              {exampleFrom && (
-                <p className="italic mt-0.5 text-slate-600">"{exampleFrom}"</p>
-              )}
+  return (
+    <div
+      ref={parent}
+      className={`relative w-full h-90 perspective-1000 ${
+        status === "pending" && "opacity-70"
+      }`}
+      onMouseEnter={() => setIsFlipped(true)}
+      onMouseLeave={() => setIsFlipped(false)}
+    >
+      {/* Trading Card Container */}
+      <div
+        className={`relative w-full h-full transition-transform duration-700 transform-style-preserve-3d ${
+          isFlipped ? "rotate-y-180" : ""
+        }`}
+      >
+        {/* Front Side (Word) */}
+        <div className="absolute inset-0 w-full h-full backface-hidden">
+          <div
+            className={`relative w-full h-full rounded-2xl shadow-xl border-2 ${colors.border} overflow-hidden group`}
+          >
+            {/* Background Pattern */}
+            <div className={`absolute inset-0 ${colors.bg} opacity-90`} />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+
+            {/* Corner Decoration */}
+            <div className="absolute top-0 left-0 w-8 h-8 bg-white/20 rounded-br-xl" />
+            <div className="absolute bottom-0 right-0 w-8 h-8 bg-white/20 rounded-tl-xl" />
+
+            {/* Action Button */}
+            {status === "added" && (
+              <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <AppAlertDialog
+                  title="Delete this word?"
+                  description="This word will be permanently removed from your list. This action cannot be undone."
+                  onConfirm={() => onDelete?.(id)}
+                >
+                  <button className="p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors">
+                    <Trash size={16} className="text-white" />
+                  </button>
+                </AppAlertDialog>
+              </div>
+            )}
+
+            {/* Content */}
+            <div className="relative z-10 p-6 h-full flex flex-col justify-between">
+              {/* Header */}
+              <div className="text-center">
+                <span
+                  className={`inline-block px-3 py-1 ${colors.text} text-xs font-bold rounded-full uppercase tracking-wider shadow-lg`}
+                >
+                  {typeName}
+                </span>
+              </div>
+
+              {/* Main Word */}
+              <div className="text-center flex-1 flex flex-col justify-center">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <img
+                    src={getFlagURL(langTo)}
+                    alt={langTo}
+                    className="w-8 h-8 drop-shadow-lg"
+                  />
+                  <h2 className="text-3xl font-bold text-white drop-shadow-lg capitalize">
+                    {wordTo}
+                  </h2>
+                </div>
+                {exampleTo && (
+                  <p className="text-white/90 italic text-sm leading-relaxed">
+                    "{exampleTo}"
+                  </p>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="text-center">
+                <div className="text-white/70 text-xs">
+                  Hover to see translation
+                </div>
+                {status === "added" && (
+                  <div className="text-white/60 text-xs mt-1">
+                    Added {getDaysAgo(createdAt.toString())}
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-        </div>
-        {status === "added" && (
-          <div className="flex justify-between items-center gap-0.5">
-            <ShowButton {...{ showTranslation, setShowTranslation }} />
-            <span className="text-sm text-gray-400 inline-block">
-              Added {getDaysAgo(createdAt.toString())}
-            </span>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </div>
+
+        {/* Back Side (Translation) */}
+        <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180">
+          <div className="relative w-full h-full rounded-2xl shadow-xl border-2 border-gray-300 bg-gradient-to-br from-gray-50 to-white overflow-hidden">
+            {/* Background Pattern */}
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.8),transparent)]" />
+
+            {/* Corner Decoration */}
+            <div className="absolute top-0 left-0 w-8 h-8 bg-gray-300 rounded-br-xl" />
+            <div className="absolute bottom-0 right-0 w-8 h-8 bg-gray-300 rounded-tl-xl" />
+
+            {/* Content */}
+            <div className="relative z-10 p-6 h-full flex flex-col justify-between">
+              {/* Header */}
+              <div className="text-center">
+                <span className="inline-block px-3 py-1 bg-gray-600 text-white text-xs font-bold rounded-full uppercase tracking-wider">
+                  Translation
+                </span>
+              </div>
+
+              {/* Main Translation */}
+              <div className="text-center flex-1 flex flex-col justify-center">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <img
+                    src={getFlagURL(langFrom)}
+                    alt={langFrom}
+                    className="w-8 h-8 drop-shadow-lg"
+                  />
+                  <h2 className="text-3xl font-bold text-gray-800 drop-shadow-sm capitalize">
+                    {wordFrom}
+                  </h2>
+                </div>
+                {exampleFrom && (
+                  <p className="text-gray-600 italic text-sm leading-relaxed">
+                    "{exampleFrom}"
+                  </p>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="text-center">
+                <div className="text-gray-500 text-xs">
+                  Release to flip back
+                </div>
+                {status === "added" && (
+                  <div className="text-gray-400 text-xs mt-1">
+                    Added {getDaysAgo(createdAt.toString())}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

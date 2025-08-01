@@ -38,23 +38,53 @@ export const FEATURES: Feature[] = [
   },
 ]
 
-export const WORD_TYPE: Record<string, string> = {
-  adj: "adjective",
-  nf: "noun feminine",
-  nm: "noun masculine",
-  vi: "verb intransitive",
-  vt: "verb transitive",
-  adv: "adverb",
-  pron: "pronoun",
-  n: "noun",
-  "loc prep": "prepositional phrase",
-  nfpl: "noun feminine plural",
-  nmpl: "noun masculine plural",
-  vti: "verb intransitive",
-  vtt: "verb transitive",
-  "nm, nf": "noun masculine/feminine",
-}
-
+export const WORD_TYPE: Record<string, { name: string; associated: string[] }> =
+  {
+    adj: {
+      name: "adjective",
+      associated: ["adj", "adv", "pron", "adj mf", "adj m", "adj f", "adj inv"],
+    },
+    adv: {
+      name: "adverb",
+      associated: ["adv"],
+    },
+    pron: {
+      name: "pronoun",
+      associated: ["pron"],
+    },
+    prep: {
+      name: "preposition",
+      associated: ["prep", "loc prep"],
+    },
+    nf: {
+      name: "noun (f)",
+      associated: ["nf", "nfpl"],
+    },
+    nm: {
+      name: "noun (m)",
+      associated: ["nm", "nmpl"],
+    },
+    nmf: {
+      name: "noun (m,f)",
+      associated: ["nm, nf"],
+    },
+    n: {
+      name: "noun",
+      associated: ["n"],
+    },
+    vi: {
+      name: "verb",
+      associated: ["vi", "vt", "vti", "vtt", "v", "vtr", "v prnl"],
+    },
+    conj: {
+      name: "conjunction",
+      associated: ["conj"],
+    },
+    interj: {
+      name: "interjection",
+      associated: ["interj"],
+    },
+  }
 export const LANG: Record<string, Lang> = {
   fr: {
     name: "french",
