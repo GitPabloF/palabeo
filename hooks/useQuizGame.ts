@@ -6,10 +6,18 @@ export function useQuizGame(questions: Question[], words: Word[]) {
   const [questionIndex, setQuestionIndex] = useState(0)
   const [score, setScore] = useState(0)
   const [wrongWords, setWrongWords] = useState<string[]>([])
+  const [isQuizStarted, setIsQuizStarted] = useState(false)
 
   const totalQuestions = questions.length
   const currentQuestion = questions[questionIndex]
   const isGameComplete = questionIndex >= totalQuestions
+
+  /**
+   * Start the quiz
+   */
+  function startQuiz() {
+    setIsQuizStarted(true)
+  }
 
   /**
    * Handle the next question and the score
@@ -47,7 +55,9 @@ export function useQuizGame(questions: Question[], words: Word[]) {
     score,
     totalQuestions,
     isGameComplete,
+    isQuizStarted,
     wrongWordsData,
     handleNextQuestion,
+    startQuiz,
   }
 }

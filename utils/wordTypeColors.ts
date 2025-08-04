@@ -16,7 +16,7 @@ const TYPE_COLORS: Record<
     glow: string
   }
 > = {
-  verb: {
+  v: {
     bg: "bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-400",
     text: "text-white",
     border: "border-blue-400",
@@ -47,22 +47,6 @@ const TYPE_COLORS: Record<
     gradient: "from-purple-500 via-pink-400 to-purple-600",
     rarity: "bg-gradient-to-r from-purple-400 to-pink-300",
     glow: "shadow-purple-500/50",
-  },
-  vi: {
-    bg: "bg-gradient-to-br from-green-600 via-green-500 to-emerald-400",
-    text: "text-white",
-    border: "border-green-400",
-    gradient: "from-green-500 via-emerald-400 to-green-600",
-    rarity: "bg-gradient-to-r from-green-400 to-emerald-300",
-    glow: "shadow-green-500/50",
-  },
-  vt: {
-    bg: "bg-gradient-to-br from-green-600 via-green-500 to-emerald-400",
-    text: "text-white",
-    border: "border-green-400",
-    gradient: "from-green-500 via-emerald-400 to-green-600",
-    rarity: "bg-gradient-to-r from-green-400 to-emerald-300",
-    glow: "shadow-green-500/50",
   },
   adv: {
     bg: "bg-gradient-to-br from-violet-600 via-violet-500 to-purple-400",

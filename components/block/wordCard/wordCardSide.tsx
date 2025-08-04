@@ -1,4 +1,4 @@
-import AppAlertDialog from "@/app/app/components/appAlertDialog"
+import AppAlertDialog from "@/components/block/appAlertDialog"
 import WordCardHeader from "./wordCardHeader"
 import WordCardFooter from "./wordCardFooter"
 import WordCardContent from "./wordCardContent"
