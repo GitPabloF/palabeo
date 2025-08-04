@@ -5,7 +5,7 @@ import { Word } from "@/types/main"
 import { useUser } from "@/contexts/UserContext"
 import { useWords } from "@/hooks/useWords"
 import { Plus } from "lucide-react"
-import PageHeader from "@/components/ui/pageHeader"
+import PageHeader from "@/components/block/pageHeader"
 import { VocabularyList } from "@/components/vocabulary/VocabularyList"
 
 export default function Words() {
@@ -35,8 +35,9 @@ export default function Words() {
     <>
       <PageHeader
         title="Add a word"
-        description="Type a word and discover its translation ! You can then add it to your vocabulary to review it later."
-        leftIcon={Plus}
+        description="Develop your card collection"
+        colorType="nm"
+        icon={Plus}
       />
 
       {/* Add Word Form */}
