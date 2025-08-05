@@ -1,11 +1,14 @@
 import { LANG, WORD_TYPE } from "@/content/main"
+import { LucideIcon } from "lucide-react"
 
 export type Feature = {
   id: number
   name: string
   color: string
-  icon: string
+  icon: LucideIcon
   path: string
+  route: string
+  description?: string
 }
 
 // LANG

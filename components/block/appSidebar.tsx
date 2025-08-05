@@ -60,18 +60,8 @@ export default function AppSidebar() {
                         className="transition-colors duration-200 py-2 px-5"
                       >
                         <span className="flex items-center gap-2 transition-transform peer-hover/menu-button:translate-x-2">
-                          <div
-                            className={`${feature.color} rounded-lg w-[32px] h-[32px] flex items-center justify-center`}
-                          >
-                            <Image
-                              src={`/icons/${feature.icon}.svg`}
-                              alt={feature.name}
-                              width={16}
-                              height={15}
-                              priority
-                            />
-                          </div>
-                          <span className="capitalize font-semibold text-base">
+                          {feature.icon && <feature.icon className="w-5 h-5" />}
+                          <span className="capitalize font-semibold text-base text-gray-600">
                             {feature.name}
                           </span>
                         </span>
