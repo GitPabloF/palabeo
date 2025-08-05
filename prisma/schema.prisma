@@ -18,7 +18,7 @@ model User {
   id String @id @default(cuid())
   email String @unique 
   name String?
-  words     Word[]  
+  userWords     UserWord[]  // Relation many-to-many via UserWord
   userLanguage LangCode @default(en)
   learnedLanguage LangCode @default(es)
   createdAt DateTime @default(now())
@@ -36,15 +36,28 @@ model Word {
   typeCode     String
   typeName     String
   createdAt    DateTime @default(now())
-  user         User     @relation(fields: [userId], references: [id])
+  userWords    UserWord[]
+  tag          String? 
+  @@index([langFrom, langTo])
+  @@index([typeCode])
+}
+
+// Table de liaison pour la relation many-to-many
+model UserWord {
+  id           Int      @id @default(autoincrement())
   userId       String
-
+  wordId       Int
   lastReviewed DateTime?
-  reviewCount Int      @default(0)
-  mastered    Boolean  @default(false)
+  reviewCount  Int      @default(0)
+  mastered     Boolean  @default(false)
+  createdAt    DateTime @default(now())
 
-  @@index([userId, langFrom, langTo])
-  @@index([userId, typeCode])
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word         Word     @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, wordId])
+  @@index([userId])
+  @@index([wordId])
 }
 
 enum LangCode {
