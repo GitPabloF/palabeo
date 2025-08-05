@@ -1,4 +1,5 @@
 import { Feature, Lang, Word, Question } from "@/types/main"
+import { Plus, Library, Sword, Settings } from "lucide-react"
 
 export const sampleQuestions: Question[] = [
   {
@@ -39,90 +40,41 @@ export const sampleQuestions: Question[] = [
   },
 ]
 
-//
-const isGameComplete = true
-const sampleTest = {
-  score: 3,
-  totalQuestions: 6,
-  wrongWordsData: [
-    {
-      id: 8,
-      wordFrom: "car",
-      wordTo: "coche",
-      exampleFrom: "The car sped down the highway.",
-      exampleTo: "El coche iba a toda velocidad por la carretera.",
-      langFrom: "en",
-      langTo: "es",
-      typeCode: "nm",
-      typeName: "noun masculine",
-      createdAt: "2025-07-31T13:41:07.217Z",
-      userId: "cmdopvcgj0000v1ckd5h4x3e9",
-      lastReviewed: null,
-      reviewCount: 0,
-      mastered: false,
-      user: {
-        name: "Test User",
-        email: "test@example.com",
-      },
-    },
-    {
-      id: 6,
-      wordFrom: "house",
-      wordTo: "casa",
-      exampleFrom: "Their new house has three bathrooms.",
-      exampleTo: "Su nueva casa tiene tres baños.",
-      langFrom: "en",
-      langTo: "es",
-      typeCode: "nf",
-      typeName: "noun feminine",
-      createdAt: "2025-07-31T13:40:52.410Z",
-      userId: "cmdopvcgj0000v1ckd5h4x3e9",
-      lastReviewed: null,
-      reviewCount: 0,
-      mastered: false,
-      user: {
-        name: "Test User",
-        email: "test@example.com",
-      },
-    },
-  ],
-}
-
 export const FEATURES: Feature[] = [
   {
     id: 1,
     name: "add words",
-    color: "bg-amber-500",
-    icon: "plus",
+    description: "Develop your collection",
+    color: "nm",
+    icon: Plus,
     path: "add",
+    route: "/app/add",
   },
   {
     id: 2,
-    name: "my vocabulary",
-    color: "bg-cyan-500",
-    icon: "book",
+    name: "collection",
+    description: "All your words",
+    color: "adj",
+    icon: Library,
     path: "vocabulary",
+    route: "/app/vocabulary",
   },
   {
     id: 3,
     name: "practice",
-    color: "bg-green-400",
-    icon: "dumbel",
+    description: "Master your words",
+    color: "v",
+    icon: Sword,
     path: "practice",
+    route: "/app/practice",
   },
   {
     id: 4,
-    name: "progress",
-    color: "bg-yellow-300",
-    icon: "progress",
-    path: "progress",
-  },
-  {
-    id: 5,
     name: "settings",
-    color: "bg-gray-300",
-    icon: "settings",
+    color: "x",
+    icon: Settings,
     path: "settings",
+    route: "/app/settings",
   },
 ]
 
