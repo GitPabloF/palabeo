@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { error } from "console"
 
+/**
+ * Create a new user
+ * @param request - The request object
+ * @returns The created user
+ */
 export async function POST(request: NextRequest) {
   try {
-    const { email, name } = await request.json()
+    const { email, name, userLanguage, learnedLanguage } = await request.json()
 
     if (!email || !name) {
       return NextResponse.json(
@@ -28,6 +32,8 @@ export async function POST(request: NextRequest) {
       data: {
         email,
         name: name,
+        userLanguage: userLanguage || "en",
+        learnedLanguage: learnedLanguage || "es",
       },
     })
 
@@ -51,6 +57,10 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * Get all users
+ * @returns The users
+ */
 export async function GET() {
   try {
     const users = await prisma.user.findMany({
@@ -58,9 +68,14 @@ export async function GET() {
         id: true,
         email: true,
         name: true,
+        userLanguage: true,
+        learnedLanguage: true,
+        userWords: true,
+        createdAt: true,
+        updatedAt: true,
         _count: {
           select: {
-            words: true,
+            userWords: true,
           },
         },
       },
