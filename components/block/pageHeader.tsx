@@ -1,6 +1,7 @@
 import { LucideIcon } from "lucide-react"
 import { getTypeColors } from "@/utils/wordTypeColors"
 import { WordTypeCode } from "@/types/main"
+import StyledIcon from "@/components/ui/styledIcon"
 
 interface PageHeaderProps {
   title: string
@@ -20,15 +21,7 @@ export default function PageHeader({
   return (
     <div className="text-center mb-12">
       <div className="inline-flex items-center gap-4 mb-6">
-        {Icon && (
-          <div className="relative">
-            <div
-              className={`w-20 h-20 ${colors.bg} rounded-3xl flex items-center justify-center shadow-2xl border-4 ${colors.border} transition-all duration-300 hover:scale-110`}
-            >
-              <Icon className="w-10 h-10 text-white" />
-            </div>
-          </div>
-        )}
+        {Icon && <StyledIcon Icon={Icon} colorType={colorType} />}
         <div>
           <h1 className="text-5xl font-bold text-gray-800 mb-2">{title}</h1>
           <p className="text-xl text-gray-600">{description}</p>

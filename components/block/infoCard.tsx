@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button"
 
 import { Badge } from "@/components/ui/badge"
-import { Zap } from "lucide-react"
 import { getTypeColors } from "@/utils/wordTypeColors"
 
 interface QuizIntroProps {
@@ -35,7 +34,7 @@ export default function QuizIntro({
 
   return (
     <div
-      className={`overflow-hidden relative z-10 rounded-3xl shadow-2xl border-4 ${colors.border} group transition-all duration-300 hover:${colors.glow}`}
+      className={`overflow-hidden relative z-10 rounded-3xl shadow-2xl border-4 ${colors.border} group transition-all duration-300 hover:${colors.glow} h-full`}
     >
       <div className={`absolute inset-0 ${colors.bg} opacity-95`} />
       {/* Background gradient & shiny effect */}
@@ -46,7 +45,9 @@ export default function QuizIntro({
 
       <div className="relative z-10 p-8 flex flex-col gap-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-white mb-3">{title}</h2>
+          <h2 className="text-3xl font-bold text-white mb-3 capitalize">
+            {title}
+          </h2>
           <p className="text-xl text-white/90">{description}</p>
         </div>
 
@@ -65,9 +66,11 @@ export default function QuizIntro({
         </div>
 
         {/* Game rules with word card styling */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-          {children}
-        </div>
+        {children && (
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+            {children}
+          </div>
+        )}
 
         {button && (
           <div className="text-center">
