@@ -1,12 +1,12 @@
 import { useEffect } from "react"
 import { RotateCcw, Trophy, Target, BookOpen, Star } from "lucide-react"
 
-import WordCard from "@/components/block/wordCard/wordCard"
 import type { Word } from "@/types/main"
 import { Card, CardContent } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
+import { VocabularyList } from "@/components/vocabulary/VocabularyList"
 
 export default function QuizResult({
   score,
@@ -129,11 +129,11 @@ export default function QuizResult({
           <Separator />
 
           <ScrollArea className="flex-1">
-            <div className="space-y-4">
-              {wrongWordsData.map((word) => (
-                <WordCard key={word.id} {...word} showAllTranslation={true} />
-              ))}
-            </div>
+            <VocabularyList
+              words={wrongWordsData}
+              loading={false}
+              showAllTranslation={true}
+            />
           </ScrollArea>
         </div>
       )}

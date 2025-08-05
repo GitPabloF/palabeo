@@ -12,15 +12,17 @@ interface VocabularyListProps {
 
 export function VocabularyList({
   words,
-  loading,
   onDelete,
+  loading,
   showAllTranslation,
 }: VocabularyListProps) {
   const [parent] = useAutoAnimate()
 
   if (loading) {
     return (
-      <div className="flex-1 flex flex-col gap-5">
+      <div className="lex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <CardSkeleton />
+        <CardSkeleton />
         <CardSkeleton />
         <CardSkeleton />
         <CardSkeleton />
