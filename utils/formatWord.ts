@@ -25,21 +25,21 @@ export function formatTypeCode(type?: string): string {
 }
 
 export function formatWord(word: string): string {
-  // D'abord nettoyer les flèches et espaces
+  // Remove arrows and spaces
   let formattedWord = word.replace(/⇒\s*/g, "").trim()
 
-  // Vérifier s'il y a une virgule (séparation de mots)
+  // Check if there is a comma (word separation)
   if (formattedWord.includes(",")) {
     const words = formattedWord.split(",").map((w) => w.trim())
 
     if (words.length === 2) {
       const [first, second] = words
 
-      // Vérifier si c'est une variante masculin/féminin
+      // Check if it's a masculine/feminine variant
       if (isMasculineFeminineVariant(first, second)) {
         return `${first}/${second.slice(-1)}` // "gato/a"
       } else {
-        // Sinon, ce sont des synonymes, garder le premier
+        // If not, they are synonyms, keep the first
         return first
       }
     }
@@ -48,9 +48,9 @@ export function formatWord(word: string): string {
   return formattedWord
 }
 
-// Fonction pour détecter les variantes masculin/féminin
+// Function to detect masculine/feminine variants
 function isMasculineFeminineVariant(word1: string, word2: string): boolean {
-  // Règles communes pour détecter les variantes m/f
+  // Common rules to detect masculine/feminine variants
   const patterns = [
     // o/a (gato/gata)
     { pattern: /^(.+)o$/, suffix: "a" },
@@ -85,5 +85,5 @@ function isMasculineFeminineVariant(word1: string, word2: string): boolean {
 }
 
 export function formatExemple(exemple: string): string {
-  return exemple.split("//")[0].trim()
+  return exemple.split("//")[0].trim().replace("ⓘ", "")
 }
