@@ -56,8 +56,8 @@ export const FEATURES: Feature[] = [
     description: "All your words",
     color: "adj",
     icon: Library,
-    path: "vocabulary",
-    route: "/app/vocabulary",
+    path: "collection",
+    route: "/app/collection",
   },
   {
     id: 3,
