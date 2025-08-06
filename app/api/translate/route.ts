@@ -1,3 +1,4 @@
+// to do: remoe id and createdAt
 import { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
 import {
@@ -72,7 +73,6 @@ export async function GET(request: NextRequest) {
       : translation.example?.to?.[0]
 
     const formattedData = {
-      id: crypto.randomUUID(),
       wordFrom: formatWord(wordFrom),
       wordTo: formatWord(wordTo),
       typeCode: formatTypeCode(typeCode),
@@ -81,7 +81,6 @@ export async function GET(request: NextRequest) {
       langTo: isReversedLang ? from : to,
       exampleFrom: formatExemple(exampleFrom),
       exampleTo: formatExemple(exampleTo),
-      createdAt: new Date().toISOString().split("T")[0],
     }
 
     return NextResponse.json(

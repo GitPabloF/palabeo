@@ -23,7 +23,7 @@ export type WordTypeCode = keyof typeof WORD_TYPE
 
 // WORD
 export type Word = {
-  id: number
+  id?: number
   wordFrom: string
   wordTo: string
   typeCode: string
@@ -32,7 +32,7 @@ export type Word = {
   langTo: LangCode
   exampleFrom: string
   exampleTo: string
-  createdAt: string | Date
+  createdAt?: string | Date
 }
 
 export type Question = {
