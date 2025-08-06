@@ -12,6 +12,8 @@ import { getFlagURL } from "@/utils/getFlag"
 import WordCard from "@/components/block/wordCard/wordCard"
 import CardSkeleton from "@/components/ui/cardSkeleton"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
+import { useTranslate } from "@/hooks/useTranslate"
+import LangToogler from "@/components/block/LangToogler"
 
 import {
   Form,
@@ -23,101 +25,77 @@ import {
 import { Input } from "@/components/ui/input"
 
 const formSchema = z.object({
-  from: z.string(),
+  value: z.string(),
 })
 
 type AddProps = {
   displayWord: (word: Word | null) => void
-  onLoadingChange: (loading: boolean) => void
-  addWord: () => void
+  addWord: (word: Word) => void
+  userId: string
   userLanguage: LangCode
   leanedLanguage: LangCode
 }
 
 export default function Add({
   displayWord,
-  onLoadingChange,
   addWord,
   userLanguage,
   leanedLanguage,
+  userId,
 }: AddProps) {
+  const [parent] = useAutoAnimate()
+
   const [fromLang, setFromLang] = useState<LangCode>(userLanguage)
   const [toLang, setToLang] = useState<LangCode>(leanedLanguage)
-  const [error, setError] = useState<string | null>(null)
-  const [translatedWord, setTranslatedWord] = useState<null | Word>(null)
-  const [isReversedLang, setIsReversedLang] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [parent] = useAutoAnimate()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      from: "",
+      value: "",
     },
   })
 
-  const watchedWord = form.watch("from")
+  const watchedWord = form.watch("value")
 
+  /*
+   * IF the word is in the database, return the word data
+   * IF the word is NOT in the database, translate the word data
+   * return the word data
+   */
+  const { error, wordData, setWordData, isLoading } = useTranslate(
+    watchedWord,
+    userId,
+    fromLang,
+    toLang
+  )
+
+  // Display the word data when it's available
   useEffect(() => {
-    async function translateWord() {
-      setError(null)
-      setTranslatedWord(null)
-      if (watchedWord && watchedWord.length > 2) {
-        try {
-          setIsLoading(true)
-          onLoadingChange?.(true)
-          const response = await fetch(
-            `/api/translate?word=${encodeURIComponent(
-              watchedWord
-            )}&from=${fromLang}&to=${toLang}&isReversedLang=${isReversedLang}`
-          )
-          if (!response.ok) {
-            setIsLoading(false)
-            onLoadingChange?.(false)
-            setError("an error has ocurred")
-            return
-          }
-          const json = await response.json()
-          setIsLoading(false)
-          onLoadingChange?.(false)
-          const newWord: Word = json.data
-          setTranslatedWord(newWord)
-        } catch (error) {
-          setIsLoading(false)
-          onLoadingChange?.(false)
-          console.error("Translation error:", error)
-        }
-      } else {
-        setIsLoading(false)
-        onLoadingChange?.(false)
-      }
+    displayWord(wordData)
+  }, [wordData, displayWord])
+
+  /**
+   * Emit the word data to the parent component and reset the form
+   */
+  function handleAddWord() {
+    if (wordData) {
+      addWord(wordData)
+      resetForm()
     }
-    const timerId = setTimeout(() => {
-      translateWord()
-    }, 500)
-
-    return () => clearTimeout(timerId)
-  }, [watchedWord, form, fromLang, toLang, isReversedLang, onLoadingChange])
-
-  useEffect(() => {
-    displayWord(translatedWord)
-  }, [translatedWord, displayWord])
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    form.reset()
   }
 
   function resetForm() {
     form.reset()
-    setTranslatedWord(null)
+    setWordData(null)
   }
 
-  function toggleDirection() {
-    setIsReversedLang(!isReversedLang)
-    setFromLang((prev) =>
-      prev === userLanguage ? leanedLanguage : userLanguage
-    )
-    setToLang((prev) => (prev === userLanguage ? leanedLanguage : userLanguage))
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      if (wordData) {
+        handleAddWord()
+      }
+    }
   }
 
   return (
@@ -129,13 +107,10 @@ export default function Add({
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-6"
-          >
+          <form className="flex flex-col gap-6">
             <FormField
               control={form.control}
-              name="from"
+              name="value"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
@@ -152,6 +127,7 @@ export default function Add({
                         placeholder={`Exemple : ${LANG[fromLang].exemple}`}
                         className="pl-10 h-12 text-base"
                         {...field}
+                        onKeyDown={handleKeyDown}
                       />
                     </div>
                   </FormControl>
@@ -161,22 +137,15 @@ export default function Add({
             />
 
             <div className="flex flex-col gap-4" ref={parent}>
-              <Button
-                type="button"
-                variant="ghost"
-                className="text-sm text-muted-foreground hover:text-foreground px-2 py-1 self-center flex items-center gap-2"
-                onClick={toggleDirection}
-              >
-                <ArrowRightLeft className="w-4 h-4" />
-                <span className="flex items-center gap-1">
-                  <span className="font-medium">{fromLang.toUpperCase()}</span>
-                  <span className="text-xs">→</span>
-                  <span className="font-medium">{toLang.toUpperCase()}</span>
-                </span>
-              </Button>
+              <LangToogler
+                fromLang={fromLang}
+                toLang={toLang}
+                setFromLang={setFromLang}
+                setToLang={setToLang}
+              />
 
               {/* Translation Preview */}
-              {isLoading && (
+              {isLoading && !wordData && (
                 <div className="py-4 flex justify-center">
                   <div className="w-full max-w-sm">
                     <CardSkeleton />
@@ -184,10 +153,10 @@ export default function Add({
                 </div>
               )}
 
-              {translatedWord && (
+              {wordData && (
                 <div className="py-4 flex justify-center">
                   <div className="w-full max-w-[280px]">
-                    <WordCard {...translatedWord} status="pending" />
+                    <WordCard {...wordData} status="pending" />
                   </div>
                 </div>
               )}
@@ -196,16 +165,16 @@ export default function Add({
                 <Button
                   className="font-medium cursor-pointer gap-2 flex-1 h-12"
                   variant="outline"
-                  disabled={!translatedWord}
+                  disabled={!wordData}
                   onClick={resetForm}
                 >
                   <X className="w-4 h-4" />
                   <span>Annuler</span>
                 </Button>
                 <Button
+                  type="submit"
                   className="bg-brand-orange/90 font-medium hover:bg-brand-orange cursor-pointer disabled:bg-brand-orange/70 gap-2 flex-1 h-12"
-                  disabled={!translatedWord}
-                  onClick={addWord}
+                  disabled={isLoading || !wordData}
                 >
                   <Plus className="w-4 h-4" />
                   <span>Ajouter le mot</span>
