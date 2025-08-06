@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react"
-import { Word as PrismaWord } from "@/lib/generated/prisma"
+import { Word as PrismaWord, UserWord } from "@/lib/generated/prisma"
 import { Word as Word } from "@/types/main"
+import type { Error } from "@/types/response"
+import { apiRequest } from "@/utils/fetch"
 
 export function useWords(userId?: string) {
-  type Error = {
-    message: string
-    status?: number
-  }
-
   const [words, setWords] = useState<PrismaWord[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
@@ -19,25 +16,16 @@ export function useWords(userId?: string) {
     setError(null)
 
     try {
-      const response = await fetch(`/api/users/${userId}/words`)
-      if (!response.ok) {
-        const errorMessage =
-          response.status === 404
-            ? "Utilisateur non trouvé"
-            : response.status === 500
-            ? "Erreur serveur"
-            : `Erreur ${response.status}: ${response.statusText}`
-
-        setError({ message: errorMessage, status: response.status })
-        return
+      const data = await apiRequest(`/api/users/${userId}/words`)
+      if (data) {
+        setWords(data)
       }
-      const data = await response.json()
-      setWords(data)
     } catch (error) {
-      console.error("Erreur fetchWords:", error)
-
       setError({
-        message: error instanceof Error ? error.message : "Erreur de connexion",
+        message:
+          error instanceof Error
+            ? error.message
+            : "An error occurred while fetching words",
         status: 500,
       })
     } finally {
@@ -45,101 +33,140 @@ export function useWords(userId?: string) {
     }
   }
 
-  async function addWord(word: Word) {
-    if (!userId) return false
+  /**
+   * Validate word
+   * @param word - The word to validate
+   * @returns True if the word is valid, false otherwise
+   */
+  const validateWord = (word: Word): boolean => {
+    const requiredFields = [
+      word.wordFrom,
+      word.wordTo,
+      word.exampleFrom,
+      word.exampleTo,
+      word.langFrom,
+      word.langTo,
+      word.typeCode,
+      word.typeName,
+    ]
 
-    const {
-      wordFrom,
-      wordTo,
-      exampleFrom,
-      exampleTo,
-      langFrom,
-      langTo,
-      typeCode,
-      typeName,
-    } = word
-
-    if (
-      !wordFrom ||
-      !wordTo ||
-      !exampleFrom ||
-      !exampleTo ||
-      !langFrom ||
-      !langTo ||
-      !typeCode ||
-      !typeName
-    ) {
-      setError({ message: "Missing required fields", status: 400 })
+    if (requiredFields.some((field) => !field)) {
+      setError({ message: "All fields are required", status: 400 })
       return false
     }
 
+    return true
+  }
+
+  /**
+   * Add a word to the user
+   * If the word has an ID, check if it exists in the database
+   * If the word does not have an ID, create a new word and add it to the user
+   * @param word - The word to add
+   * @returns True if the word is added, false otherwise
+   */
+  async function addWord(word: Word) {
+    if (!userId) return false
+
+    if (!validateWord(word)) {
+      return false
+    }
+
+    const { id: wordId } = word
+
     try {
-      const response = await fetch(`/api/users/${userId}/words`, {
-        method: "POST",
-        body: JSON.stringify(word),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
+      // Case 1: The word has an ID - check if it exists
+      if (wordId) {
+        const wordData = await apiRequest(`/api/words/${wordId}`)
 
-      if (!response.ok) {
-        let errorMessage: string
-        switch (response.status) {
-          case 400:
-            return "Missing required fields"
-          case 409:
-            errorMessage = "Word already exists"
-            break
-          default:
-            errorMessage = `Erreur ${response.status}: ${response.statusText}`
+        if (wordData) {
+          // Verify if the user already has this word
+          const isAlreadyAdded = wordData.userWords.some(
+            (userWord: UserWord) => userWord.userId === userId
+          )
+
+          if (isAlreadyAdded) {
+            setError({ message: "Word already added", status: 401 })
+            return false
+          }
+
+          // Add the word to the user
+          const addResult = await apiRequest(
+            `/api/users/${userId}/words/${wordId}`,
+            {
+              method: "POST",
+            }
+          )
+
+          if (addResult) {
+            setWords((prev) => [...prev, wordData])
+            return true
+          }
+        } else {
+          // The word does not exist, create it
+          return await createNewWord(word)
         }
-        setError({ message: errorMessage, status: response.status })
-        return false
+      } else {
+        // Case 2: No ID - create a new word
+        return await createNewWord(word)
       }
-
-      const { word: newWord } = await response.json()
-      setWords((prev) => [...prev, newWord])
-      return true
     } catch (error) {
       console.error("Erreur addWord:", error)
       setError({
-        message: error instanceof Error ? error.message : "Erreur de connexion",
+        message:
+          error instanceof Error
+            ? error.message
+            : "An error occurred while adding the word",
         status: 500,
       })
       return false
     }
   }
 
+  /**
+   * Create a new word
+   * @param word - The word to create
+   * @returns True if the word is created, false otherwise
+   */
+  const createNewWord = async (word: Word): Promise<boolean> => {
+    const newWord = await apiRequest(`/api/words`, {
+      method: "POST",
+      body: JSON.stringify(word),
+    })
+
+    if (newWord) {
+      const addResult = await apiRequest(
+        `/api/users/${userId}/words/${newWord.id}`,
+        {
+          method: "POST",
+        }
+      )
+
+      if (addResult) {
+        setWords((prev) => [...prev, newWord])
+        return true
+      }
+    }
+    return false
+  }
+
   async function deleteWord(wordId: number) {
     if (!userId) return false
 
     try {
-      const response = await fetch(`/api/users/${userId}/words/${wordId}`, {
+      const result = await apiRequest(`/api/users/${userId}/words/${wordId}`, {
         method: "DELETE",
       })
 
-      if (!response.ok) {
-        const errorMessage =
-          response.status === 404
-            ? "Mot non trouvé"
-            : response.status === 403
-            ? "Vous n'êtes pas autorisé à supprimer ce mot"
-            : `Erreur ${response.status}: ${response.statusText}`
-
-        setError({ message: errorMessage, status: response.status })
-        return false
+      if (result !== null) {
+        setWords((prev) => prev.filter((word) => word.id !== wordId))
+        return true
       }
-
-      setWords((prev) => prev.filter((word) => word.id !== wordId))
-      return true
+      return false
     } catch (error) {
       console.error("Erreur deleteWord:", error)
-
       setError({
-        message:
-          error instanceof Error
-            ? error.message
-            : "Erreur lors de la suppression",
+        message: error instanceof Error ? error.message : "Erreur de connexion",
         status: 500,
       })
       return false
@@ -149,18 +176,16 @@ export function useWords(userId?: string) {
   const clearError = () => setError(null)
 
   useEffect(() => {
-    if (userId) {
-      fetchWords()
-    }
+    fetchWords()
   }, [userId])
 
   return {
     words,
     loading,
     error,
-    deleteWord,
     addWord,
-    refetch: fetchWords,
+    deleteWord,
     clearError,
+    refetch: fetchWords,
   }
 }
