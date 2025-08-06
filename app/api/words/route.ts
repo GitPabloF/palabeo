@@ -101,6 +101,20 @@ export async function POST(request: NextRequest) {
       typeName,
     } = await request.json()
 
+    const isWordInDatabase = await prisma.word.findFirst({
+      where: {
+        wordFrom,
+        wordTo,
+      },
+    })
+
+    if (isWordInDatabase) {
+      return NextResponse.json(
+        { error: "Word already in database" },
+        { status: 401 }
+      )
+    }
+
     const word = await prisma.word.create({
       data: {
         wordFrom,
