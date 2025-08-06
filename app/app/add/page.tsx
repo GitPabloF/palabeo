@@ -22,7 +22,6 @@ export default function AddPage() {
 
   async function handleAdd() {
     if (!translatedWord) return
-    console.log("translatedWord", translatedWord)
 
     await addWord(translatedWord)
   }
