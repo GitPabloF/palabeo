@@ -25,9 +25,17 @@ export async function GET(
       where: {
         userId: userId,
       },
+      include: {
+        word: true,
+      },
     })
 
-    return NextResponse.json(userWords)
+    const words = userWords.map((userWord) => userWord.word)
+    if (!words) {
+      return NextResponse.json({ error: "No words found" }, { status: 404 })
+    }
+
+    return NextResponse.json(words)
   } catch (error) {
     console.error("Error fetching words:", error)
     return NextResponse.json(
