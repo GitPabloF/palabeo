@@ -1,4 +1,3 @@
-// to do: remoe id and createdAt
 import { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
 import {
