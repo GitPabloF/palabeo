@@ -34,7 +34,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     const defaultUser: User = {
       id: "cmdopvcgj0000v1ckd5h4x3e9",
       email: "test@example.com",
-      name: "Test User",
+      name: "Pablo F",
       userLanguage: "en",
       learnedLanguage: "es",
     }

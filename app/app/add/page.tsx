@@ -8,9 +8,8 @@ import { Plus } from "lucide-react"
 import PageHeader from "@/components/block/pageHeader"
 import { VocabularyList } from "@/components/vocabulary/VocabularyList"
 
-export default function Words() {
+export default function AddPage() {
   const [translatedWord, setTranslatedWord] = useState<null | Word>(null)
-  const [isLoading, setIsLoading] = useState(false)
 
   const { currentUser } = useUser()
   const { addWord, words, loading } = useWords(currentUser?.id)
@@ -23,6 +22,7 @@ export default function Words() {
 
   async function handleAdd() {
     if (!translatedWord) return
+    console.log("translatedWord", translatedWord)
 
     await addWord(translatedWord)
   }
@@ -44,8 +44,8 @@ export default function Words() {
       <section id="add" className="mb-8">
         <Add
           displayWord={handleTranslatedWord}
-          onLoadingChange={setIsLoading}
           addWord={handleAdd}
+          userId={currentUser?.id}
           userLanguage={currentUser?.userLanguage}
           leanedLanguage={currentUser?.learnedLanguage}
         />
@@ -54,7 +54,7 @@ export default function Words() {
       {/* Recently Added Words */}
       {words.length > 0 && (
         <section className="space-y-4">
-          <h3 className="text-xl font-semibold mb-2 text-center text-slate-700 mb-4">
+          <h3 className="text-xl font-semibold text-center text-slate-700 mb-4">
             Recently added words:
           </h3>
 
