@@ -13,7 +13,7 @@ type CardSideProps = {
   lang: LangCode
   typeName?: string
   colors?: ReturnType<typeof getTypeColors>
-  id: number
+  id?: number
   createdAt?: string
   status?: string
   onDelete?: (id: number) => void
@@ -36,20 +36,23 @@ export default function WordCardSide({
   const isFront = side === "front"
 
   const cardStyles = isFront
-    ? `relative w-full h-full rounded-3xl shadow-2xl border-4 ${
+    ? `relative w-full h-full rounded-[28px] shadow-2xl border-[6px] ${
         colors?.border
       } overflow-hidden group transition-all duration-300 ${
-        isHovered ? `${colors?.glow} shadow-2xl` : ""
+        isHovered ? `${colors?.glow} shadow-2xl` : "shadow-xl"
       }`
-    : "relative w-full h-full rounded-3xl shadow-2xl border-4 border-gray-300 bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden"
+    : "relative w-full h-full rounded-[28px] shadow-xl border-[6px] border-gray-300 bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-hidden"
 
   const backgroundElements = isFront ? (
     <>
+      {/* Base gradient */}
       <div className={`absolute inset-0 ${colors?.bg} opacity-95`} />
-      {/* <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-black/10" /> */}
+      {/* Subtle grid texture */}
+      <div className="absolute inset-0 opacity-[0.08] bg-[radial-gradient(circle_at_20%_10%,#fff,transparent_30%),radial-gradient(circle_at_80%_20%,#fff,transparent_25%),radial-gradient(circle_at_50%_80%,#fff,transparent_30%)]" />
+      {/* Holographic foil sweep */}
       <div
-        className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12 transition-transform duration-1000 ${
-          isHovered ? "translate-x-full" : "-translate-x-full"
+        className={`absolute inset-0 [background:conic-gradient(from_180deg_at_50%_50%,rgba(255,255,255,0.0),rgba(255,255,255,0.22),rgba(255,255,255,0.0))] mix-blend-soft-light opacity-70 transition-transform duration-700 ${
+          isHovered ? "translate-x-0" : "-translate-x-4"
         }`}
       />
     </>

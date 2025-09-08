@@ -51,12 +51,19 @@ export default function WordCard({
   return (
     <div
       ref={parent}
-      className={`relative w-full h-100 perspective-1000 ${
+      className={`relative w-full max-w-[320px] aspect-[63/88] perspective-1000 ${
         status === "pending" && "animate-wiggle"
       }`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
+      {/* Outer glow / drop shadow frame */}
+      <div
+        className={`pointer-events-none absolute -inset-1 rounded-[28px] opacity-60 blur-md transition-opacity duration-500 ${
+          isHovered ? colors.glow : "opacity-40"
+        }`}
+      />
+
       {/* Trading Card Container */}
       <div
         className={`relative w-full h-full transition-all duration-700 transform-style-preserve-3d ${
@@ -72,7 +79,7 @@ export default function WordCard({
             lang={langTo}
             typeName={typeName}
             colors={colors}
-            id={id}
+            {...(id !== undefined ? { id } : {})}
             createdAt={createdAt?.toString()}
             status={status}
             onDelete={onDelete}
@@ -87,7 +94,7 @@ export default function WordCard({
             word={wordFrom}
             example={exampleFrom}
             lang={langFrom}
-            id={id}
+            {...(id !== undefined ? { id } : {})}
             createdAt={createdAt?.toString()}
             onDelete={onDelete}
             status={status}

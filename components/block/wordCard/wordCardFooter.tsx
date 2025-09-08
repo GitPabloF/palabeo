@@ -2,7 +2,7 @@ import { getDaysAgo } from "@/utils/formatDate"
 
 type CardFooterProps = {
   isFront?: boolean
-  id: number
+  id?: number
   createdAt?: string
   status?: string
 }
@@ -24,7 +24,9 @@ export default function WordCardFooter({
       {status === "added" && createdAt && (
         <div className="text-xs">Collected {getDaysAgo(createdAt)}</div>
       )}
-      <div className="text-xs font-mono">#{String(id).padStart(4, "0")}</div>
+      {typeof id === "number" && (
+        <div className="text-xs font-mono">#{String(id).padStart(4, "0")}</div>
+      )}
     </div>
   )
 }
