@@ -102,13 +102,13 @@ export default function Home() {
         </p>
         <div className="flex items-center justify-center gap-3">
           <Link
-            href="/signin"
+            href="/login"
             className="rounded-md bg-blue-600 px-5 py-3 text-white font-semibold shadow-sm hover:bg-blue-600/90 transition relative overflow-hidden"
           >
-            Sign in
+            Log In
           </Link>
           <a
-            href="/signup"
+            href="/register"
             className="rounded-md border px-5 py-3 font-semibold text-gray-700 bg-white shadow-sm hover:bg-gray-50 transition"
           >
             Sign up
