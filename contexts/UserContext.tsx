@@ -41,14 +41,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      // Récupérer l'utilisateur par email pour obtenir son ID
+      // Get the user by email to get the ID
       const userResponse = await fetch(`/api/users?email=${session.user.email}`)
       if (userResponse.ok) {
         const users = await userResponse.json()
         const user = users.find((u: any) => u.email === session.user?.email)
 
         if (user) {
-          // Maintenant récupérer les données complètes avec l'ID
+          // Get the complete data with the ID
           const response = await fetch(`/api/users/${user.id}`)
           if (response.ok) {
             const userData = await response.json()
@@ -79,7 +79,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     if (status === "unauthenticated") {
       setCurrentUser(null)
       setLoading(false)
-      // Rediriger vers login si on est dans une page protégée
+      // Redirect to login if we are in a protected page
       if (window.location.pathname.startsWith("/app")) {
         router.push("/login")
       }

@@ -4,6 +4,14 @@ import Image from "next/image"
 
 import { usePathname } from "next/navigation"
 import { FEATURES } from "@/content/main"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { User2 } from "lucide-react"
+import { ChevronUp } from "lucide-react"
 
 import {
   Sidebar,
@@ -16,9 +24,17 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
+import { useSession, signOut } from "next-auth/react"
+import { useUser } from "@/contexts/UserContext"
 
 export default function AppSidebar() {
   const pathname = usePathname()
+  const { data: session } = useSession()
+  const { currentUser } = useUser()
+
+  const handleSignOut = () => {
+    signOut({ callbackUrl: "/login" })
+  }
 
   return (
     <Sidebar>
@@ -75,7 +91,28 @@ export default function AppSidebar() {
         </SidebarGroup>
         <SidebarGroup />
       </SidebarContent>
-      <SidebarFooter />
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton>
+                  <User2 /> {currentUser?.name || currentUser?.email || "User"}
+                  <ChevronUp className="ml-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side="top"
+                className="w-[--radix-popper-anchor-width]"
+              >
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   )
 }
