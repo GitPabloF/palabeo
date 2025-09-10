@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { getServerSession } from "next-auth/next"
 import { prisma } from "@/lib/prisma"
 
 /**
@@ -12,13 +13,23 @@ export async function GET(
   { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    const session = await getServerSession()
     const { userId } = await params
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
-      )
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const currentUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    })
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    }
+
+    if (currentUser.id !== userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const userWords = await prisma.userWord.findMany({

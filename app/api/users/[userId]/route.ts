@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { getServerSession } from "next-auth/next"
 import { prisma } from "@/lib/prisma"
 
 /**
@@ -9,15 +10,30 @@ import { prisma } from "@/lib/prisma"
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    const session = await getServerSession()
     const { userId } = await params
 
-    if (!userId) {
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    // Get the connected user
+    const currentUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    })
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    }
+
+    // Verify that the user can only access their own data
+    if (currentUser.id !== userId) {
       return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
+        { error: "Forbidden: You can only access your own data" },
+        { status: 403 }
       )
     }
 
@@ -58,13 +74,37 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    const session = await getServerSession()
+    const { userId } = await params
+
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    // Get the connected user
+    const currentUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    })
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    }
+
+    // Verify that the user can only modify their own data
+    if (currentUser.id !== userId) {
+      return NextResponse.json(
+        { error: "Forbidden: You can only modify your own data" },
+        { status: 403 }
+      )
+    }
+
     const { name, email, userLanguage, learnedLanguage } = await request.json()
 
     const user = await prisma.user.update({
-      where: { id: params.userId },
+      where: { id: userId },
       data: {
         name: name || undefined,
         email: email || undefined,
@@ -75,7 +115,7 @@ export async function PUT(
     })
 
     return NextResponse.json({
-      message: "Utilisateur mis à jour avec succès",
+      message: "User updated successfully",
       user: {
         id: user.id,
         email: user.email,
@@ -87,9 +127,9 @@ export async function PUT(
       },
     })
   } catch (error) {
-    console.error("Erreur mise à jour utilisateur:", error)
+    console.error("Error updating user:", error)
     return NextResponse.json(
-      { error: "Erreur interne du serveur" },
+      { error: "Internal server error" },
       { status: 500 }
     )
   }
@@ -103,15 +143,30 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    const session = await getServerSession()
     const { userId } = await params
 
-    if (!userId) {
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    // Get the connected user
+    const currentUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    })
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    }
+
+    // Verify that the user can only delete their own account
+    if (currentUser.id !== userId) {
       return NextResponse.json(
-        { error: "User ID is required" },
-        { status: 400 }
+        { error: "Forbidden: You can only delete your own account" },
+        { status: 403 }
       )
     }
 
@@ -121,7 +176,7 @@ export async function DELETE(
 
     return NextResponse.json(
       { message: "User deleted successfully" },
-      { status: 204 }
+      { status: 200 }
     )
   } catch (error) {
     console.error("Error deleting user:", error)

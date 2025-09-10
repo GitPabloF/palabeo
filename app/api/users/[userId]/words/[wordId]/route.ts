@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { getServerSession } from "next-auth/next"
 import { prisma } from "@/lib/prisma"
 
 /**
@@ -12,7 +13,25 @@ export async function POST(
   { params }: { params: { userId: string; wordId: string } }
 ) {
   try {
+    const session = await getServerSession()
     const { userId, wordId } = await params
+
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const currentUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    })
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    }
+
+    if (currentUser.id !== userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     if (!userId || !wordId) {
       return NextResponse.json(
         { error: "User ID and Word ID are required" },
@@ -83,11 +102,30 @@ export async function POST(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { userId: string; wordId: string } }
+  { params }: { params: Promise<{ userId: string; wordId: string }> }
 ) {
   try {
-    const wordId = parseInt(params.wordId)
-    const userId = params.userId
+    const session = await getServerSession()
+    const { userId, wordId } = await params
+
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const currentUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    })
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    }
+
+    if (currentUser.id !== userId) {
+      return NextResponse.json(
+        { error: "Forbidden: You can only delete your own words" },
+        { status: 403 }
+      )
+    }
 
     if (!userId) {
       return NextResponse.json(
@@ -116,7 +154,7 @@ export async function DELETE(
       where: {
         userId_wordId: {
           userId,
-          wordId,
+          wordId: parseInt(wordId),
         },
       },
     })
@@ -133,18 +171,18 @@ export async function DELETE(
       where: {
         userId_wordId: {
           userId,
-          wordId,
+          wordId: parseInt(wordId),
         },
       },
     })
 
     return NextResponse.json({
-      message: "Mot supprimé avec succès",
+      message: "Word deleted successfully",
     })
   } catch (error) {
-    console.error("Erreur suppression mot:", error)
+    console.error("Error deleting word:", error)
     return NextResponse.json(
-      { error: "Erreur interne du serveur" },
+      { error: "Internal server error" },
       { status: 500 }
     )
   }
