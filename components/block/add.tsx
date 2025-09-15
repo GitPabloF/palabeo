@@ -89,13 +89,25 @@ export default function Add({
     setWordData(null)
   }
 
+  /**
+   * Handle the add word submit
+   */
+  const handleAddSubmit = () => {
+    if (wordData) {
+      handleAddWord()
+    }
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       e.preventDefault()
-      if (wordData) {
-        handleAddWord()
-      }
+      handleAddSubmit()
     }
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    handleAddSubmit()
   }
 
   return (
@@ -107,7 +119,7 @@ export default function Add({
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form className="flex flex-col gap-6">
+          <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
             <FormField
               control={form.control}
               name="value"
@@ -163,13 +175,14 @@ export default function Add({
 
               <div className="flex gap-3 w-full">
                 <Button
+                  type="button"
                   className="font-medium cursor-pointer gap-2 flex-1 h-12"
                   variant="outline"
                   disabled={!wordData}
                   onClick={resetForm}
                 >
                   <X className="w-4 h-4" />
-                  <span>Annuler</span>
+                  <span>Cancel</span>
                 </Button>
                 <Button
                   type="submit"
@@ -177,7 +190,7 @@ export default function Add({
                   disabled={isLoading || !wordData}
                 >
                   <Plus className="w-4 h-4" />
-                  <span>Ajouter le mot</span>
+                  <span>Add word</span>
                 </Button>
               </div>
             </div>
