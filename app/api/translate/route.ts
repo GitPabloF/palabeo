@@ -6,6 +6,7 @@ import {
   formatWord,
   formatExemple,
 } from "@/utils/formatWord"
+import { checkRateLimit } from "@/lib/rate-limit"
 export const runtime = "nodejs"
 
 /**
@@ -20,6 +21,20 @@ export const runtime = "nodejs"
  * - `to` (optional): target language code (default is 'fr').
  */
 export async function GET(request: NextRequest) {
+  // Rate limiting check
+  const forwarded = request.headers.get("x-forwarded-for")
+  const ip = forwarded
+    ? forwarded.split(",")[0]
+    : request.headers.get("x-real-ip") ?? "127.0.0.1"
+  const rateLimitResult = await checkRateLimit(ip)
+
+  if (!rateLimitResult) {
+    return NextResponse.json(
+      { error: "Rate limit exceeded. Please try again later." },
+      { status: 429 }
+    )
+  }
+
   const { searchParams } = new URL(request.url)
   const word = searchParams.get("word")
   const from = searchParams.get("from") || "es"
