@@ -16,7 +16,10 @@ export default function AppBackground({
 }: AppBackgroundProps) {
   return (
     <div
-      className={cn("pointer-events-none absolute inset-0 -z-10", className)}
+      className={cn(
+        "pointer-events-none fixed inset-0 min-h-screen w-screen -z-10",
+        className
+      )}
     >
       {variant === "gradient" ? (
         <>
