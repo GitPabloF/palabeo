@@ -569,6 +569,168 @@ export function isAdminRole(userRole: string | undefined): boolean {
 }
 
 /**
+ * Validate and sanitize a user ID (CUID format)
+ * @param userId - The user ID to validate
+ * @returns Validation result
+ */
+export function validateUserId(userId: unknown): ValidationResult<string> {
+  const errors: ValidationError[] = []
+
+  if (!userId) {
+    errors.push({
+      field: "userId",
+      message: "User ID parameter is required",
+      code: "REQUIRED",
+    })
+    return { success: false, errors }
+  }
+
+  if (typeof userId !== "string") {
+    errors.push({
+      field: "userId",
+      message: "User ID parameter must be a string",
+      code: "INVALID_TYPE",
+    })
+    return { success: false, errors }
+  }
+
+  // Check for dangerous content in original userId first
+  if (/<[^>]*>/.test(userId)) {
+    errors.push({
+      field: "userId",
+      message: "User ID contains invalid characters",
+      code: "INVALID_CUID_FORMAT",
+    })
+    return { success: false, errors }
+  }
+
+  const sanitized = sanitizeString(userId).toLowerCase()
+
+  if (sanitized.length === 0) {
+    errors.push({
+      field: "userId",
+      message: "User ID parameter cannot be empty after sanitization",
+      code: "EMPTY_AFTER_SANITIZATION",
+    })
+    return { success: false, errors }
+  }
+
+  // CUID validation regex
+  // CUIDs start with 'c' followed by 24 characters (lowercase letters and numbers)
+  const cuidRegex = /^c[a-z0-9]{24}$/
+  if (!cuidRegex.test(sanitized)) {
+    errors.push({
+      field: "userId",
+      message: "User ID must be a valid CUID format",
+      code: "INVALID_CUID_FORMAT",
+    })
+    return { success: false, errors }
+  }
+
+  return { success: true, data: sanitized, errors: [] }
+}
+
+/**
+ * Validate user update data (all fields optional)
+ * @param data - The user update data to validate
+ * @returns Validation result with sanitized data
+ */
+export function validateUserUpdateData(data: unknown): ValidationResult<{
+  name?: string
+  email?: string
+  userLanguage?: SupportedLanguage
+  learnedLanguage?: SupportedLanguage
+}> {
+  const errors: ValidationError[] = []
+
+  if (!data || typeof data !== "object") {
+    errors.push({
+      field: "body",
+      message: "Request body must be a valid JSON object",
+      code: "INVALID_TYPE",
+    })
+    return { success: false, errors }
+  }
+
+  const body = data as Record<string, unknown>
+  const result: {
+    name?: string
+    email?: string
+    userLanguage?: SupportedLanguage
+    learnedLanguage?: SupportedLanguage
+  } = {}
+
+  // Validate name if provided
+  if (body.name !== undefined) {
+    const nameResult = validateUserName(body.name)
+    if (!nameResult.success) {
+      errors.push(...nameResult.errors)
+    } else {
+      result.name = nameResult.data
+    }
+  }
+
+  // Validate email if provided
+  if (body.email !== undefined) {
+    const emailResult = validateEmail(body.email)
+    if (!emailResult.success) {
+      errors.push(...emailResult.errors)
+    } else {
+      result.email = emailResult.data
+    }
+  }
+
+  // Validate userLanguage if provided
+  if (body.userLanguage !== undefined) {
+    const userLanguageResult = validateLanguageCode(
+      body.userLanguage,
+      "userLanguage"
+    )
+    if (!userLanguageResult.success) {
+      errors.push(...userLanguageResult.errors)
+    } else {
+      result.userLanguage = userLanguageResult.data
+    }
+  }
+
+  // Validate learnedLanguage if provided
+  if (body.learnedLanguage !== undefined) {
+    const learnedLanguageResult = validateLanguageCode(
+      body.learnedLanguage,
+      "learnedLanguage"
+    )
+    if (!learnedLanguageResult.success) {
+      errors.push(...learnedLanguageResult.errors)
+    } else {
+      result.learnedLanguage = learnedLanguageResult.data
+    }
+  }
+
+  // Check if userLanguage and learnedLanguage are different (if both provided)
+  if (
+    result.userLanguage &&
+    result.learnedLanguage &&
+    result.userLanguage === result.learnedLanguage
+  ) {
+    errors.push({
+      field: "userLanguage/learnedLanguage",
+      message: "User language and learned language must be different",
+      code: "SAME_LANGUAGES",
+    })
+  }
+
+  if (errors.length > 0) {
+    return { success: false, errors }
+  }
+
+  return {
+    success: true,
+    data: result,
+    errors: [],
+  }
+}
+
+/**
  * Sanitize user data for safe return in API responses
  * @param user - The user object to sanitize
  * @returns Sanitized user object
