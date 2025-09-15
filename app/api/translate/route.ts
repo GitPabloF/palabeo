@@ -7,6 +7,10 @@ import {
   formatExemple,
 } from "@/utils/formatWord"
 import { checkRateLimit } from "@/lib/rate-limit"
+import {
+  validateTranslateParams,
+  createValidationErrorResponse,
+} from "@/lib/validation"
 export const runtime = "nodejs"
 
 /**
@@ -36,17 +40,18 @@ export async function GET(request: NextRequest) {
   }
 
   const { searchParams } = new URL(request.url)
-  const word = searchParams.get("word")
-  const from = searchParams.get("from") || "es"
-  const to = searchParams.get("to") || "fr"
-  const isReversedLang = searchParams.get("isReversedLang") === "true"
 
-  if (!word || !from || !to) {
+  // Validate and sanitize all input parameters
+  const validationResult = validateTranslateParams(searchParams)
+
+  if (!validationResult.success) {
     return NextResponse.json(
-      { error: "Missing parameter: 'word' | 'from' | 'to'" },
+      createValidationErrorResponse(validationResult.errors),
       { status: 400 }
     )
   }
+
+  const { word, from, to, isReversedLang } = validationResult.data!
   try {
     const proxyBaseUrl = process.env.WORDREFERENCE_PROXY_URL
     if (!proxyBaseUrl) {
