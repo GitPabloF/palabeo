@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { Prisma, LangCode } from "@/lib/generated/prisma"
 import { generateSearchVariations } from "@/utils/string"
+import { getServerSession } from "next-auth/next"
 
 /**
  * Get words
@@ -10,6 +11,15 @@ import { generateSearchVariations } from "@/utils/string"
  */
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession()
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    if (session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+
     const { searchParams } = new URL(request.url)
     const wordTo = searchParams.get("langTo") as LangCode | null
     const wordFrom = searchParams.get("langFrom") as LangCode | null
@@ -88,6 +98,11 @@ export async function GET(request: NextRequest) {
  * @returns The created word
  */
 export async function POST(request: NextRequest) {
+  const session = await getServerSession()
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
     const {
       wordFrom,

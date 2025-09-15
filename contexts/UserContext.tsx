@@ -41,25 +41,13 @@ export function UserProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      // Get the user by email to get the ID
-      const userResponse = await fetch(`/api/users?email=${session.user.email}`)
-      if (userResponse.ok) {
-        const users = await userResponse.json()
-        const user = users.find((u: any) => u.email === session.user?.email)
-
-        if (user) {
-          // Get the complete data with the ID
-          const response = await fetch(`/api/users/${user.id}`)
-          if (response.ok) {
-            const userData = await response.json()
-            setCurrentUser(userData)
-          } else {
-            console.error("Failed to fetch user data")
-            setCurrentUser(null)
-          }
-        }
+      // get the current user
+      const response = await fetch(`/api/users/me`)
+      if (response.ok) {
+        const userData = await response.json()
+        setCurrentUser(userData)
       } else {
-        console.error("Failed to find user")
+        console.error("Failed to fetch user data")
         setCurrentUser(null)
       }
     } catch (error) {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-
+import { getServerSession } from "next-auth/next"
 /**
  * Create a new user
  * @param request - The request object
@@ -8,6 +8,15 @@ import { prisma } from "@/lib/prisma"
  */
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession()
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    if (session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+
     const { email, name, userLanguage, learnedLanguage } = await request.json()
 
     if (!email || !name) {
@@ -63,6 +72,15 @@ export async function POST(request: NextRequest) {
  */
 export async function GET() {
   try {
+    const session = await getServerSession()
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    if (session.user.role !== "ADMIN") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+
     const users = await prisma.user.findMany({
       select: {
         id: true,
