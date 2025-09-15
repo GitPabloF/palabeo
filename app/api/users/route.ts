@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth/next"
+import {
+  validateUserCreationData,
+  createValidationErrorResponse,
+  isAdminRole,
+  sanitizeUserData,
+} from "@/lib/validation"
 /**
  * Create a new user
  * @param request - The request object
@@ -13,18 +19,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    if (session.user.role !== "ADMIN") {
+    if (!isAdminRole(session.user.role)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
-    const { email, name, userLanguage, learnedLanguage } = await request.json()
-
-    if (!email || !name) {
+    // Parse and validate JSON body
+    let requestBody
+    try {
+      requestBody = await request.json()
+    } catch (error) {
       return NextResponse.json(
-        { error: "Must have an email and name" },
+        { error: "Invalid JSON in request body" },
         { status: 400 }
       )
     }
+
+    // Validate and sanitize all input data
+    const validationResult = validateUserCreationData(requestBody)
+
+    if (!validationResult.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(validationResult.errors),
+        { status: 400 }
+      )
+    }
+
+    const { email, name, userLanguage, learnedLanguage } =
+      validationResult.data!
 
     // verify is the user already exist
     const existingUser = await prisma.user.findUnique({
@@ -40,9 +61,9 @@ export async function POST(request: NextRequest) {
     const user = await prisma.user.create({
       data: {
         email,
-        name: name,
-        userLanguage: userLanguage || "en",
-        learnedLanguage: learnedLanguage || "es",
+        name,
+        userLanguage,
+        learnedLanguage,
       },
     })
 
@@ -77,7 +98,7 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    if (session.user.role !== "ADMIN") {
+    if (!isAdminRole(session.user.role)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
@@ -88,7 +109,7 @@ export async function GET() {
         name: true,
         userLanguage: true,
         learnedLanguage: true,
-        userWords: true,
+        role: true,
         createdAt: true,
         updatedAt: true,
         _count: {
@@ -97,8 +118,19 @@ export async function GET() {
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     })
-    return NextResponse.json(users)
+
+    // Sanitize user data before returning (remove any potential sensitive data)
+    const sanitizedUsers = users.map(sanitizeUserData)
+
+    return NextResponse.json({
+      message: "Users retrieved successfully",
+      data: sanitizedUsers,
+      count: sanitizedUsers.length,
+    })
   } catch (error) {
     console.error("Error occured when get all the users: ", error)
     return NextResponse.json({ error: "Internal error" }, { status: 500 })
