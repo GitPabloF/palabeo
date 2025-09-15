@@ -212,7 +212,8 @@ describe("API Route /api/translate - Rate Limiting Tests", () => {
 
       // Assert
       expect(response.status).toBe(400)
-      expect(data.error).toBe("Missing parameter: 'word' | 'from' | 'to'")
+      expect(data.error).toBe("Validation failed")
+      expect(data.details).toBeDefined()
       expect(mockCheckRateLimit).toHaveBeenCalledWith("192.168.1.1")
     })
   })
@@ -312,7 +313,7 @@ describe("API Route /api/translate - Rate Limiting Tests", () => {
       })
 
       const firstRequest = new NextRequest(
-        "http://localhost:3000/api/translate?word=test1",
+        "http://localhost:3000/api/translate?word=hello&from=es&to=fr",
         {
           method: "GET",
           headers: { "x-forwarded-for": ip },
@@ -323,7 +324,7 @@ describe("API Route /api/translate - Rate Limiting Tests", () => {
       mockCheckRateLimit.mockResolvedValueOnce(false)
 
       const secondRequest = new NextRequest(
-        "http://localhost:3000/api/translate?word=test2",
+        "http://localhost:3000/api/translate?word=world&from=es&to=fr",
         {
           method: "GET",
           headers: { "x-forwarded-for": ip },
