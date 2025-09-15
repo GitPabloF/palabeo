@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma"
 import { NextRequest, NextResponse } from "next/server"
+import { getServerSession } from "next-auth/next"
 
 /**
  * Get a word by ID
@@ -11,6 +12,11 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ wordId: string }> }
 ) {
+  const session = await getServerSession()
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   const { wordId } = await params
 
   if (!wordId) {
@@ -45,6 +51,15 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ wordId: string }> }
 ) {
+  const session = await getServerSession()
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  if (session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+  }
+
   const { wordId } = await params
 
   if (!wordId) {

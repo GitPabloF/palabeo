@@ -24,6 +24,7 @@ model User {
   learnedLanguage LangCode @default(es)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  role Role @default(USER)
   
   // NextAuth fields
   accounts Account[]
@@ -104,4 +105,9 @@ enum LangCode {
   fr
   es
   en
+}
+
+enum Role {
+  USER
+  ADMIN
 }
