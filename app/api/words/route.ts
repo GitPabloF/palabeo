@@ -16,9 +16,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    if (session.user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
-    }
+    // TODO: Uncomment when can add word / verify if is in the database without this route
+    // if (session.user.role !== "ADMIN") {
+    //   return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    // }
 
     const { searchParams } = new URL(request.url)
     const wordTo = searchParams.get("langTo") as LangCode | null
