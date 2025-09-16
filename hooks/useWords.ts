@@ -16,9 +16,9 @@ export function useWords(userId?: string) {
     setError(null)
 
     try {
-      const data = await apiRequest(`/api/users/${userId}/words`)
-      if (data) {
-        setWords(data)
+      const response = await apiRequest(`/api/users/${userId}/words`)
+      if (response) {
+        setWords(response.data)
       }
     } catch (error) {
       setError({

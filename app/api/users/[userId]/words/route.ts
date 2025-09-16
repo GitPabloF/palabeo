@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
 import { prisma } from "@/lib/prisma"
+import {
+  validateUserId,
+  validatePaginationParams,
+  createValidationErrorResponse,
+  sanitizeWordData,
+  isAdminRole,
+} from "@/lib/validation"
 
 /**
  * Get all words for a user
@@ -13,12 +20,25 @@ export async function GET(
   { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    console.log("GET /api/users/[userId]/words")
     const session = await getServerSession()
     const { userId } = await params
 
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
+
+    // Validate userId format
+    const userIdValidation = validateUserId(userId)
+    if (!userIdValidation.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(userIdValidation.errors),
+        { status: 400 }
+      )
+    }
+    console.log("userIdValidation", userIdValidation)
+
+    const validatedUserId = userIdValidation.data!
 
     const currentUser = await prisma.user.findUnique({
       where: { email: session.user.email },
@@ -28,25 +48,84 @@ export async function GET(
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    if (currentUser.id !== userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    // Check if user can access this data (own data or admin)
+    if (currentUser.id !== validatedUserId && !isAdminRole(currentUser.role)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
+
+    // Validate pagination parameters (optional)
+    const { searchParams } = new URL(request.url)
+    const page = searchParams.get("page")
+    const limit = searchParams.get("limit")
+
+    // If no pagination params provided, return all words
+    if (!page && !limit) {
+      const userWords = await prisma.userWord.findMany({
+        where: {
+          userId: validatedUserId,
+        },
+        include: {
+          word: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      })
+
+      const words = userWords.map((userWord) => sanitizeWordData(userWord.word))
+
+      return NextResponse.json({
+        message: "Words retrieved successfully",
+        data: words,
+      })
+    }
+
+    const paginationValidation = validatePaginationParams(page, limit)
+    if (!paginationValidation.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(paginationValidation.errors),
+        { status: 400 }
+      )
+    }
+
+    const { limit: validatedLimit, offset } = paginationValidation.data!
+
+    // Get total count for pagination metadata
+    const totalCount = await prisma.userWord.count({
+      where: {
+        userId: validatedUserId,
+      },
+    })
 
     const userWords = await prisma.userWord.findMany({
       where: {
-        userId: userId,
+        userId: validatedUserId,
       },
       include: {
         word: true,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: validatedLimit,
+      skip: offset,
     })
 
-    const words = userWords.map((userWord) => userWord.word)
-    if (!words) {
-      return NextResponse.json({ error: "No words found" }, { status: 404 })
-    }
+    const words = userWords.map((userWord) => sanitizeWordData(userWord.word))
+    const totalPages = Math.ceil(totalCount / validatedLimit)
 
-    return NextResponse.json(words)
+    return NextResponse.json({
+      message: "Words retrieved successfully",
+      data: words,
+      pagination: {
+        page: paginationValidation.data!.page,
+        limit: validatedLimit,
+        total: totalCount,
+        totalPages,
+        hasNext: paginationValidation.data!.page < totalPages,
+        hasPrev: paginationValidation.data!.page > 1,
+      },
+    })
   } catch (error) {
     console.error("Error fetching words:", error)
     return NextResponse.json(

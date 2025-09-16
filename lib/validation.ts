@@ -731,6 +731,217 @@ export function validateUserUpdateData(data: unknown): ValidationResult<{
 }
 
 /**
+ * Validate and sanitize a word ID (integer)
+ * @param wordId - The word ID to validate
+ * @returns Validation result
+ */
+export function validateWordId(wordId: unknown): ValidationResult<number> {
+  const errors: ValidationError[] = []
+
+  if (!wordId) {
+    errors.push({
+      field: "wordId",
+      message: "Word ID parameter is required",
+      code: "REQUIRED",
+    })
+    return { success: false, errors }
+  }
+
+  if (typeof wordId !== "string" && typeof wordId !== "number") {
+    errors.push({
+      field: "wordId",
+      message: "Word ID parameter must be a string or number",
+      code: "INVALID_TYPE",
+    })
+    return { success: false, errors }
+  }
+
+  const sanitized = sanitizeString(String(wordId))
+
+  if (sanitized.length === 0) {
+    errors.push({
+      field: "wordId",
+      message: "Word ID parameter cannot be empty after sanitization",
+      code: "EMPTY_AFTER_SANITIZATION",
+    })
+    return { success: false, errors }
+  }
+
+  // Check for dangerous content in original wordId first
+  if (typeof wordId === "string" && /<[^>]*>/.test(wordId)) {
+    errors.push({
+      field: "wordId",
+      message: "Word ID contains invalid characters",
+      code: "INVALID_WORD_ID_FORMAT",
+    })
+    return { success: false, errors }
+  }
+
+  // Validate that it's a positive integer
+  const parsedId = parseInt(sanitized, 10)
+  if (
+    isNaN(parsedId) ||
+    parsedId <= 0 ||
+    !Number.isInteger(parsedId) ||
+    parsedId.toString() !== sanitized
+  ) {
+    errors.push({
+      field: "wordId",
+      message: "Word ID must be a positive integer",
+      code: "INVALID_WORD_ID_FORMAT",
+    })
+    return { success: false, errors }
+  }
+
+  // Check for reasonable range (prevent DoS with extremely large numbers)
+  if (parsedId > 2147483647) {
+    // Max 32-bit signed integer
+    errors.push({
+      field: "wordId",
+      message: "Word ID is too large",
+      code: "WORD_ID_TOO_LARGE",
+    })
+    return { success: false, errors }
+  }
+
+  return { success: true, data: parsedId, errors: [] }
+}
+
+/**
+ * Validate pagination parameters
+ * @param page - The page number
+ * @param limit - The limit per page
+ * @returns Validation result with sanitized pagination data
+ */
+export function validatePaginationParams(
+  page: unknown,
+  limit: unknown
+): ValidationResult<{ page: number; limit: number; offset: number }> {
+  const errors: ValidationError[] = []
+
+  // Validate page parameter
+  let validatedPage = 1
+  if (page !== undefined) {
+    if (typeof page !== "string" && typeof page !== "number") {
+      errors.push({
+        field: "page",
+        message: "Page parameter must be a string or number",
+        code: "INVALID_TYPE",
+      })
+    } else {
+      const sanitizedPage = sanitizeString(String(page))
+      const parsedPage = parseInt(sanitizedPage, 10)
+
+      if (
+        isNaN(parsedPage) ||
+        parsedPage < 1 ||
+        !Number.isInteger(parsedPage) ||
+        parsedPage.toString() !== sanitizedPage
+      ) {
+        errors.push({
+          field: "page",
+          message: "Page must be a positive integer",
+          code: "INVALID_PAGE_FORMAT",
+        })
+      } else if (parsedPage > 10000) {
+        // Reasonable limit
+        errors.push({
+          field: "page",
+          message: "Page number is too large",
+          code: "PAGE_TOO_LARGE",
+        })
+      } else {
+        validatedPage = parsedPage
+      }
+    }
+  }
+
+  // Validate limit parameter
+  let validatedLimit = 20 // Default limit
+  if (limit !== undefined) {
+    if (typeof limit !== "string" && typeof limit !== "number") {
+      errors.push({
+        field: "limit",
+        message: "Limit parameter must be a string or number",
+        code: "INVALID_TYPE",
+      })
+    } else {
+      const sanitizedLimit = sanitizeString(String(limit))
+      const parsedLimit = parseInt(sanitizedLimit, 10)
+
+      if (
+        isNaN(parsedLimit) ||
+        parsedLimit < 1 ||
+        !Number.isInteger(parsedLimit) ||
+        parsedLimit.toString() !== sanitizedLimit
+      ) {
+        errors.push({
+          field: "limit",
+          message: "Limit must be a positive integer",
+          code: "INVALID_LIMIT_FORMAT",
+        })
+      } else if (parsedLimit > 100) {
+        // Reasonable limit to prevent DoS
+        errors.push({
+          field: "limit",
+          message: "Limit is too large (max 100)",
+          code: "LIMIT_TOO_LARGE",
+        })
+      } else {
+        validatedLimit = parsedLimit
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    return { success: false, errors }
+  }
+
+  return {
+    success: true,
+    data: {
+      page: validatedPage,
+      limit: validatedLimit,
+      offset: (validatedPage - 1) * validatedLimit,
+    },
+    errors: [],
+  }
+}
+
+/**
+ * Sanitize word data for safe return in API responses
+ * @param word - The word object to sanitize
+ * @returns Sanitized word object
+ */
+export function sanitizeWordData(word: {
+  id: number
+  wordFrom: string
+  wordTo: string
+  exampleFrom: string
+  exampleTo: string
+  langFrom: string
+  langTo: string
+  typeCode: string
+  typeName: string
+  createdAt: Date
+  tag?: string | null
+}) {
+  return {
+    id: word.id,
+    wordFrom: word.wordFrom,
+    wordTo: word.wordTo,
+    exampleFrom: word.exampleFrom,
+    exampleTo: word.exampleTo,
+    langFrom: word.langFrom,
+    langTo: word.langTo,
+    typeCode: word.typeCode,
+    typeName: word.typeName,
+    createdAt: word.createdAt,
+    tag: word.tag,
+  }
+}
+
+/**
  * Sanitize user data for safe return in API responses
  * @param user - The user object to sanitize
  * @returns Sanitized user object

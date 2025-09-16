@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
 import { prisma } from "@/lib/prisma"
+import {
+  validateUserId,
+  validateWordId,
+  createValidationErrorResponse,
+  sanitizeWordData,
+  isAdminRole,
+} from "@/lib/validation"
 
 /**
  * Add a word to a user's list
@@ -10,7 +17,7 @@ import { prisma } from "@/lib/prisma"
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { userId: string; wordId: string } }
+  { params }: { params: Promise<{ userId: string; wordId: string }> }
 ) {
   try {
     const session = await getServerSession()
@@ -20,6 +27,27 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    // Validate userId format
+    const userIdValidation = validateUserId(userId)
+    if (!userIdValidation.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(userIdValidation.errors),
+        { status: 400 }
+      )
+    }
+
+    // Validate wordId format
+    const wordIdValidation = validateWordId(wordId)
+    if (!wordIdValidation.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(wordIdValidation.errors),
+        { status: 400 }
+      )
+    }
+
+    const validatedUserId = userIdValidation.data!
+    const validatedWordId = wordIdValidation.data!
+
     const currentUser = await prisma.user.findUnique({
       where: { email: session.user.email },
     })
@@ -28,19 +56,13 @@ export async function POST(
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    if (currentUser.id !== userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-
-    if (!userId || !wordId) {
-      return NextResponse.json(
-        { error: "User ID and Word ID are required" },
-        { status: 400 }
-      )
+    // Check if user can modify this data (own data or admin)
+    if (currentUser.id !== validatedUserId && !isAdminRole(currentUser.role)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: validatedUserId },
     })
 
     if (!user) {
@@ -49,7 +71,7 @@ export async function POST(
 
     // Check if the word exists
     const word = await prisma.word.findUnique({
-      where: { id: parseInt(wordId) },
+      where: { id: validatedWordId },
     })
 
     if (!word) {
@@ -60,21 +82,24 @@ export async function POST(
     const existingUserWord = await prisma.userWord.findUnique({
       where: {
         userId_wordId: {
-          userId,
-          wordId: parseInt(wordId),
+          userId: validatedUserId,
+          wordId: validatedWordId,
         },
       },
     })
 
     if (existingUserWord) {
-      return NextResponse.json({ error: "Already exists" }, { status: 409 })
+      return NextResponse.json(
+        { error: "Word already exists in user's list" },
+        { status: 409 }
+      )
     }
 
     // Create a new user word
     const userWord = await prisma.userWord.create({
       data: {
-        userId,
-        wordId: parseInt(wordId),
+        userId: validatedUserId,
+        wordId: validatedWordId,
       },
       include: {
         word: true,
@@ -82,7 +107,18 @@ export async function POST(
     })
 
     return NextResponse.json(
-      { message: "Word added", userWord },
+      {
+        message: "Word added successfully",
+        data: {
+          userWord: {
+            id: userWord.id,
+            userId: userWord.userId,
+            wordId: userWord.wordId,
+            createdAt: userWord.createdAt,
+            word: sanitizeWordData(userWord.word),
+          },
+        },
+      },
       { status: 201 }
     )
   } catch (error) {
@@ -112,6 +148,27 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
+    // Validate userId format
+    const userIdValidation = validateUserId(userId)
+    if (!userIdValidation.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(userIdValidation.errors),
+        { status: 400 }
+      )
+    }
+
+    // Validate wordId format
+    const wordIdValidation = validateWordId(wordId)
+    if (!wordIdValidation.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(wordIdValidation.errors),
+        { status: 400 }
+      )
+    }
+
+    const validatedUserId = userIdValidation.data!
+    const validatedWordId = wordIdValidation.data!
+
     const currentUser = await prisma.user.findUnique({
       where: { email: session.user.email },
     })
@@ -120,32 +177,11 @@ export async function DELETE(
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    if (currentUser.id !== userId) {
+    // Check if user can modify this data (own data or admin)
+    if (currentUser.id !== validatedUserId && !isAdminRole(currentUser.role)) {
       return NextResponse.json(
         { error: "Forbidden: You can only delete your own words" },
         { status: 403 }
-      )
-    }
-
-    if (!userId) {
-      return NextResponse.json(
-        {
-          error: "You must provide an userId",
-        },
-        {
-          status: 400,
-        }
-      )
-    }
-
-    if (!wordId) {
-      return NextResponse.json(
-        {
-          error: "You must provide a wordId ",
-        },
-        {
-          status: 400,
-        }
       )
     }
 
@@ -153,8 +189,8 @@ export async function DELETE(
     const userWord = await prisma.userWord.findUnique({
       where: {
         userId_wordId: {
-          userId,
-          wordId: parseInt(wordId),
+          userId: validatedUserId,
+          wordId: validatedWordId,
         },
       },
     })
@@ -170,8 +206,8 @@ export async function DELETE(
     await prisma.userWord.delete({
       where: {
         userId_wordId: {
-          userId,
-          wordId: parseInt(wordId),
+          userId: validatedUserId,
+          wordId: validatedWordId,
         },
       },
     })
