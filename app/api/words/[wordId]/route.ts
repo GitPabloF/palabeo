@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth/next"
+import { validateWordId, createValidationErrorResponse } from "@/lib/validation"
 
 /**
  * Get a word by ID
@@ -19,11 +20,16 @@ export async function GET(
 
   const { wordId } = await params
 
-  if (!wordId) {
-    return NextResponse.json({ error: "Word ID is required" }, { status: 400 })
+  // Validate wordId parameter
+  const validationResult = validateWordId(wordId)
+  if (!validationResult.success) {
+    return NextResponse.json(
+      createValidationErrorResponse(validationResult.errors),
+      { status: 400 }
+    )
   }
 
-  const wordIdNumber = parseInt(wordId, 10)
+  const wordIdNumber = validationResult.data
 
   const word = await prisma.word.findUnique({
     where: {
@@ -62,17 +68,26 @@ export async function DELETE(
 
   const { wordId } = await params
 
-  if (!wordId) {
-    return NextResponse.json({ error: "Word ID is required" }, { status: 400 })
-  }
-
-  const wordIdNumber = parseInt(wordId, 10)
-
-  if (isNaN(wordIdNumber)) {
+  // Validate wordId parameter
+  const validationResult = validateWordId(wordId)
+  if (!validationResult.success) {
     return NextResponse.json(
-      { error: "Invalid word ID format" },
+      createValidationErrorResponse(validationResult.errors),
       { status: 400 }
     )
+  }
+
+  const wordIdNumber = validationResult.data
+
+  // Check if word exists before attempting to delete
+  const existingWord = await prisma.word.findUnique({
+    where: {
+      id: wordIdNumber,
+    },
+  })
+
+  if (!existingWord) {
+    return NextResponse.json({ error: "Word not found" }, { status: 404 })
   }
 
   const word = await prisma.word.delete({
@@ -80,10 +95,6 @@ export async function DELETE(
       id: wordIdNumber,
     },
   })
-
-  if (!word) {
-    return NextResponse.json({ error: "Word not found" }, { status: 404 })
-  }
 
   return NextResponse.json({ message: "Word deleted" }, { status: 200 })
 }

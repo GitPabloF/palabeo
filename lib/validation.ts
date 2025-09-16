@@ -971,6 +971,342 @@ export function sanitizeUserData(user: {
 }
 
 /**
+ * Validate and sanitize word creation data
+ * @param data - The word data to validate
+ * @returns Validation result with sanitized data
+ */
+export function validateWordCreationData(data: unknown): ValidationResult<{
+  wordFrom: string
+  wordTo: string
+  langFrom: SupportedLanguage
+  langTo: SupportedLanguage
+  typeCode: string
+  tag?: string
+  exampleFrom: string
+  exampleTo: string
+  typeName: string
+}> {
+  const errors: ValidationError[] = []
+
+  if (!data || typeof data !== "object") {
+    errors.push({
+      field: "body",
+      message: "Request body must be a valid JSON object",
+      code: "INVALID_TYPE",
+    })
+    return { success: false, errors }
+  }
+
+  const body = data as Record<string, unknown>
+
+  // Validate wordFrom
+  const wordFromResult = validateWord(body.wordFrom)
+  if (!wordFromResult.success) {
+    errors.push(...wordFromResult.errors)
+  }
+
+  // Validate wordTo
+  const wordToResult = validateWord(body.wordTo)
+  if (!wordToResult.success) {
+    errors.push(...wordToResult.errors)
+  }
+
+  // Validate langFrom (default to 'es')
+  const langFromParam = body.langFrom || "es"
+  const langFromResult = validateLanguageCode(langFromParam, "langFrom")
+  if (!langFromResult.success) {
+    errors.push(...langFromResult.errors)
+  }
+
+  // Validate langTo (default to 'fr')
+  const langToParam = body.langTo || "fr"
+  const langToResult = validateLanguageCode(langToParam, "langTo")
+  if (!langToResult.success) {
+    errors.push(...langToResult.errors)
+  }
+
+  // Validate typeCode
+  if (body.typeCode !== undefined) {
+    if (typeof body.typeCode !== "string") {
+      errors.push({
+        field: "typeCode",
+        message: "Type code must be a string",
+        code: "INVALID_TYPE",
+      })
+    } else {
+      const sanitizedTypeCode = sanitizeString(body.typeCode)
+      if (sanitizedTypeCode.length === 0) {
+        errors.push({
+          field: "typeCode",
+          message: "Type code cannot be empty after sanitization",
+          code: "EMPTY_AFTER_SANITIZATION",
+        })
+      } else if (sanitizedTypeCode.length > 50) {
+        errors.push({
+          field: "typeCode",
+          message: "Type code must be no more than 50 characters long",
+          code: "TOO_LONG",
+        })
+      }
+    }
+  }
+
+  // Validate tag (optional)
+  let sanitizedTag: string | undefined
+  if (body.tag !== undefined && body.tag !== null) {
+    if (typeof body.tag !== "string") {
+      errors.push({
+        field: "tag",
+        message: "Tag must be a string",
+        code: "INVALID_TYPE",
+      })
+    } else {
+      sanitizedTag = sanitizeString(body.tag)
+      if (sanitizedTag.length > 100) {
+        errors.push({
+          field: "tag",
+          message: "Tag must be no more than 100 characters long",
+          code: "TOO_LONG",
+        })
+      }
+    }
+  }
+
+  // Validate exampleFrom (required)
+  if (!body.exampleFrom) {
+    errors.push({
+      field: "exampleFrom",
+      message: "Example from is required",
+      code: "REQUIRED",
+    })
+  } else if (typeof body.exampleFrom !== "string") {
+    errors.push({
+      field: "exampleFrom",
+      message: "Example from must be a string",
+      code: "INVALID_TYPE",
+    })
+  }
+
+  let sanitizedExampleFrom: string = ""
+  if (body.exampleFrom && typeof body.exampleFrom === "string") {
+    sanitizedExampleFrom = sanitizeString(body.exampleFrom)
+    if (sanitizedExampleFrom.length === 0) {
+      errors.push({
+        field: "exampleFrom",
+        message: "Example from cannot be empty after sanitization",
+        code: "EMPTY_AFTER_SANITIZATION",
+      })
+    } else if (sanitizedExampleFrom.length > 500) {
+      errors.push({
+        field: "exampleFrom",
+        message: "Example from must be no more than 500 characters long",
+        code: "TOO_LONG",
+      })
+    }
+  }
+
+  // Validate exampleTo (required)
+  if (!body.exampleTo) {
+    errors.push({
+      field: "exampleTo",
+      message: "Example to is required",
+      code: "REQUIRED",
+    })
+  } else if (typeof body.exampleTo !== "string") {
+    errors.push({
+      field: "exampleTo",
+      message: "Example to must be a string",
+      code: "INVALID_TYPE",
+    })
+  }
+
+  let sanitizedExampleTo: string = ""
+  if (body.exampleTo && typeof body.exampleTo === "string") {
+    sanitizedExampleTo = sanitizeString(body.exampleTo)
+    if (sanitizedExampleTo.length === 0) {
+      errors.push({
+        field: "exampleTo",
+        message: "Example to cannot be empty after sanitization",
+        code: "EMPTY_AFTER_SANITIZATION",
+      })
+    } else if (sanitizedExampleTo.length > 500) {
+      errors.push({
+        field: "exampleTo",
+        message: "Example to must be no more than 500 characters long",
+        code: "TOO_LONG",
+      })
+    }
+  }
+
+  // Validate typeName (required)
+  if (!body.typeName) {
+    errors.push({
+      field: "typeName",
+      message: "Type name is required",
+      code: "REQUIRED",
+    })
+  } else if (typeof body.typeName !== "string") {
+    errors.push({
+      field: "typeName",
+      message: "Type name must be a string",
+      code: "INVALID_TYPE",
+    })
+  }
+
+  let sanitizedTypeName: string = ""
+  if (body.typeName && typeof body.typeName === "string") {
+    sanitizedTypeName = sanitizeString(body.typeName)
+    if (sanitizedTypeName.length === 0) {
+      errors.push({
+        field: "typeName",
+        message: "Type name cannot be empty after sanitization",
+        code: "EMPTY_AFTER_SANITIZATION",
+      })
+    } else if (sanitizedTypeName.length > 100) {
+      errors.push({
+        field: "typeName",
+        message: "Type name must be no more than 100 characters long",
+        code: "TOO_LONG",
+      })
+    }
+  }
+
+  // Check if langFrom and langTo are different
+  if (
+    langFromResult.success &&
+    langToResult.success &&
+    langFromResult.data === langToResult.data
+  ) {
+    errors.push({
+      field: "langFrom/langTo",
+      message: "Source and target languages must be different",
+      code: "SAME_LANGUAGES",
+    })
+  }
+
+  if (errors.length > 0) {
+    return { success: false, errors }
+  }
+
+  return {
+    success: true,
+    data: {
+      wordFrom: wordFromResult.data!,
+      wordTo: wordToResult.data!,
+      langFrom: langFromResult.data!,
+      langTo: langToResult.data!,
+      typeCode: sanitizeString(String(body.typeCode || "")),
+      tag: sanitizedTag,
+      exampleFrom: sanitizedExampleFrom,
+      exampleTo: sanitizedExampleTo,
+      typeName: sanitizedTypeName,
+    },
+    errors: [],
+  }
+}
+
+/**
+ * Validate words search parameters
+ * @param searchParams - URL search parameters
+ * @returns Validation result with sanitized data
+ */
+export function validateWordsSearchParams(
+  searchParams: URLSearchParams
+): ValidationResult<{
+  langTo?: SupportedLanguage
+  langFrom?: SupportedLanguage
+  typeCode?: string
+  tag?: string
+  word?: string
+}> {
+  const errors: ValidationError[] = []
+  const result: {
+    langTo?: SupportedLanguage
+    langFrom?: SupportedLanguage
+    typeCode?: string
+    tag?: string
+    word?: string
+  } = {}
+
+  // Validate langTo (optional)
+  const langToParam = searchParams.get("langTo")
+  if (langToParam) {
+    const langToResult = validateLanguageCode(langToParam, "langTo")
+    if (!langToResult.success) {
+      errors.push(...langToResult.errors)
+    } else {
+      result.langTo = langToResult.data
+    }
+  }
+
+  // Validate langFrom (optional)
+  const langFromParam = searchParams.get("langFrom")
+  if (langFromParam) {
+    const langFromResult = validateLanguageCode(langFromParam, "langFrom")
+    if (!langFromResult.success) {
+      errors.push(...langFromResult.errors)
+    } else {
+      result.langFrom = langFromResult.data
+    }
+  }
+
+  // Validate typeCode (optional)
+  const typeCodeParam = searchParams.get("typeCode")
+  if (typeCodeParam) {
+    if (typeof typeCodeParam === "string") {
+      const sanitizedTypeCode = sanitizeString(typeCodeParam)
+      if (sanitizedTypeCode.length > 50) {
+        errors.push({
+          field: "typeCode",
+          message: "Type code must be no more than 50 characters long",
+          code: "TOO_LONG",
+        })
+      } else {
+        result.typeCode = sanitizedTypeCode
+      }
+    }
+  }
+
+  // Validate tag (optional)
+  const tagParam = searchParams.get("tag")
+  if (tagParam) {
+    if (typeof tagParam === "string") {
+      const sanitizedTag = sanitizeString(tagParam)
+      if (sanitizedTag.length > 100) {
+        errors.push({
+          field: "tag",
+          message: "Tag must be no more than 100 characters long",
+          code: "TOO_LONG",
+        })
+      } else {
+        result.tag = sanitizedTag
+      }
+    }
+  }
+
+  // Validate word (optional)
+  const wordParam = searchParams.get("word")
+  if (wordParam) {
+    const wordResult = validateWord(wordParam)
+    if (!wordResult.success) {
+      errors.push(...wordResult.errors)
+    } else {
+      result.word = wordResult.data
+    }
+  }
+
+  if (errors.length > 0) {
+    return { success: false, errors }
+  }
+
+  return {
+    success: true,
+    data: result,
+    errors: [],
+  }
+}
+
+/**
  * Create a standardized error response for validation failures
  * @param errors - Array of validation errors
  * @param statusCode - HTTP status code (default: 400)

@@ -3,6 +3,11 @@ import { prisma } from "@/lib/prisma"
 import { Prisma, LangCode } from "@/lib/generated/prisma"
 import { generateSearchVariations } from "@/utils/string"
 import { getServerSession } from "next-auth/next"
+import {
+  validateWordsSearchParams,
+  validateWordCreationData,
+  createValidationErrorResponse,
+} from "@/lib/validation"
 
 /**
  * Get words
@@ -22,16 +27,28 @@ export async function GET(request: NextRequest) {
     // }
 
     const { searchParams } = new URL(request.url)
-    const wordTo = searchParams.get("langTo") as LangCode | null
-    const wordFrom = searchParams.get("langFrom") as LangCode | null
-    const typeCode = searchParams.get("typeCode")
-    const tag = searchParams.get("tag")
-    const searchWord = searchParams.get("word")
+
+    // Validate search parameters
+    const validationResult = validateWordsSearchParams(searchParams)
+    if (!validationResult.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(validationResult.errors),
+        { status: 400 }
+      )
+    }
+
+    const {
+      langTo,
+      langFrom,
+      typeCode,
+      tag,
+      word: searchWord,
+    } = validationResult.data!
 
     const where: Prisma.WordWhereInput = {}
 
-    if (wordTo) where.langTo = wordTo
-    if (wordFrom) where.langFrom = wordFrom
+    if (langTo) where.langTo = langTo
+    if (langFrom) where.langFrom = langFrom
     if (typeCode) where.typeCode = typeCode
     if (tag) where.tag = tag
 
@@ -105,6 +122,17 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const body = await request.json()
+
+    // Validate word creation data
+    const validationResult = validateWordCreationData(body)
+    if (!validationResult.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(validationResult.errors),
+        { status: 400 }
+      )
+    }
+
     const {
       wordFrom,
       wordTo,
@@ -115,7 +143,7 @@ export async function POST(request: NextRequest) {
       exampleFrom,
       exampleTo,
       typeName,
-    } = await request.json()
+    } = validationResult.data!
 
     const isWordInDatabase = await prisma.word.findFirst({
       where: {
@@ -127,7 +155,7 @@ export async function POST(request: NextRequest) {
     if (isWordInDatabase) {
       return NextResponse.json(
         { error: "Word already in database" },
-        { status: 401 }
+        { status: 409 }
       )
     }
 
@@ -138,16 +166,16 @@ export async function POST(request: NextRequest) {
         langFrom,
         langTo,
         typeCode,
-        tag,
         exampleFrom,
         exampleTo,
         typeName,
+        ...(tag && { tag }),
       },
     })
 
     return NextResponse.json(word)
   } catch (error) {
-    console.error("Error fetching words:", error)
+    console.error("Error creating word:", error)
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
