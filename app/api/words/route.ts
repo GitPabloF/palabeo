@@ -7,6 +7,7 @@ import {
   validateWordsSearchParams,
   validateWordCreationData,
   createValidationErrorResponse,
+  validateSession,
 } from "@/lib/validation"
 
 /**
@@ -17,8 +18,13 @@ import {
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession()
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    // Validate session with robust validation
+    const sessionValidation = validateSession(session)
+    if (!sessionValidation.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(sessionValidation.errors),
+        { status: 401 }
+      )
     }
 
     // TODO: Uncomment when can add word / verify if is in the database without this route
@@ -117,8 +123,13 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   const session = await getServerSession()
-  if (!session?.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  // Validate session with robust validation
+  const sessionValidation = validateSession(session)
+  if (!sessionValidation.success) {
+    return NextResponse.json(
+      createValidationErrorResponse(sessionValidation.errors),
+      { status: 401 }
+    )
   }
 
   try {

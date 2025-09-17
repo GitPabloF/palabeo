@@ -7,6 +7,7 @@ import {
   createValidationErrorResponse,
   sanitizeUserData,
   isAdminRole,
+  validateSession,
 } from "@/lib/validation"
 
 /**
@@ -23,8 +24,13 @@ export async function GET(
     const session = await getServerSession()
     const { userId } = await params
 
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    // Validate session with robust validation
+    const sessionValidation = validateSession(session)
+    if (!sessionValidation.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(sessionValidation.errors),
+        { status: 401 }
+      )
     }
 
     // Validate userId format
@@ -40,7 +46,7 @@ export async function GET(
 
     // Get the connected user
     const currentUser = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: sessionValidation.data!.email },
     })
 
     if (!currentUser) {
@@ -104,8 +110,13 @@ export async function PUT(
     const session = await getServerSession()
     const { userId } = await params
 
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    // Validate session with robust validation
+    const sessionValidation = validateSession(session)
+    if (!sessionValidation.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(sessionValidation.errors),
+        { status: 401 }
+      )
     }
 
     // Validate userId format
@@ -121,7 +132,7 @@ export async function PUT(
 
     // Get the connected user
     const currentUser = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: sessionValidation.data!.email },
     })
 
     if (!currentUser) {
@@ -209,8 +220,13 @@ export async function DELETE(
     const session = await getServerSession()
     const { userId } = await params
 
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    // Validate session with robust validation
+    const sessionValidation = validateSession(session)
+    if (!sessionValidation.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(sessionValidation.errors),
+        { status: 401 }
+      )
     }
 
     // Validate userId format
@@ -226,7 +242,7 @@ export async function DELETE(
 
     // Get the connected user
     const currentUser = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: sessionValidation.data!.email },
     })
 
     if (!currentUser) {

@@ -7,6 +7,7 @@ import {
   createValidationErrorResponse,
   sanitizeWordData,
   isAdminRole,
+  validateSession,
 } from "@/lib/validation"
 
 /**
@@ -23,8 +24,13 @@ export async function POST(
     const session = await getServerSession()
     const { userId, wordId } = await params
 
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    // Validate session with robust validation
+    const sessionValidation = validateSession(session)
+    if (!sessionValidation.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(sessionValidation.errors),
+        { status: 401 }
+      )
     }
 
     // Validate userId format
@@ -49,7 +55,7 @@ export async function POST(
     const validatedWordId = wordIdValidation.data!
 
     const currentUser = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: sessionValidation.data!.email },
     })
 
     if (!currentUser) {
@@ -144,8 +150,13 @@ export async function DELETE(
     const session = await getServerSession()
     const { userId, wordId } = await params
 
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    // Validate session with robust validation
+    const sessionValidation = validateSession(session)
+    if (!sessionValidation.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(sessionValidation.errors),
+        { status: 401 }
+      )
     }
 
     // Validate userId format
@@ -170,7 +181,7 @@ export async function DELETE(
     const validatedWordId = wordIdValidation.data!
 
     const currentUser = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: sessionValidation.data!.email },
     })
 
     if (!currentUser) {

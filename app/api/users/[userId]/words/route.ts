@@ -7,6 +7,7 @@ import {
   createValidationErrorResponse,
   sanitizeWordData,
   isAdminRole,
+  validateSession,
 } from "@/lib/validation"
 
 /**
@@ -20,12 +21,16 @@ export async function GET(
   { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    console.log("GET /api/users/[userId]/words")
     const session = await getServerSession()
     const { userId } = await params
 
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    // Validate session with robust validation
+    const sessionValidation = validateSession(session)
+    if (!sessionValidation.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(sessionValidation.errors),
+        { status: 401 }
+      )
     }
 
     // Validate userId format
@@ -36,12 +41,11 @@ export async function GET(
         { status: 400 }
       )
     }
-    console.log("userIdValidation", userIdValidation)
 
     const validatedUserId = userIdValidation.data!
 
     const currentUser = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: sessionValidation.data!.email },
     })
 
     if (!currentUser) {
