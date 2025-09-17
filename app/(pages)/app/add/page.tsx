@@ -7,11 +7,13 @@ import { useWords } from "@/hooks/useWords"
 import { Plus } from "lucide-react"
 import PageHeader from "@/components/block/pageHeader"
 import { VocabularyList } from "@/components/vocabulary/VocabularyList"
+import { Skeleton } from "@/components/ui/skeleton"
+import CardSkeleton from "@/components/ui/cardSkeleton"
 
 export default function AddPage() {
   const [translatedWord, setTranslatedWord] = useState<null | Word>(null)
 
-  const { currentUser } = useUser()
+  const { currentUser, loading: userLoading } = useUser()
   const { addWord, words, loading } = useWords(currentUser?.id)
 
   function handleTranslatedWord(word: Word | null) {
@@ -26,7 +28,7 @@ export default function AddPage() {
     await addWord(translatedWord)
   }
 
-  if (!currentUser) {
+  if (!currentUser && !userLoading) {
     return <div>You need to be logged in to add words</div>
   }
 
@@ -39,16 +41,27 @@ export default function AddPage() {
         icon={Plus}
       />
 
+      {/* Loading Skeleton */}
+      {userLoading && (
+        <div>
+          <Skeleton className="w-full h-70" />
+          <Skeleton className="w-1/4 h-10 mx-auto mt-6 mb-6" />
+          <VocabularyList loading={loading} />
+        </div>
+      )}
+
       {/* Add Word Form */}
-      <section id="add" className="mb-8">
-        <Add
-          displayWord={handleTranslatedWord}
-          addWord={handleAdd}
-          userId={currentUser?.id}
-          userLanguage={currentUser?.userLanguage}
-          leanedLanguage={currentUser?.learnedLanguage}
-        />
-      </section>
+      {currentUser && (
+        <section id="add" className="mb-8">
+          <Add
+            displayWord={handleTranslatedWord}
+            addWord={handleAdd}
+            userId={currentUser.id}
+            userLanguage={currentUser.userLanguage}
+            leanedLanguage={currentUser.learnedLanguage}
+          />
+        </section>
+      )}
 
       {/* Recently Added Words */}
       {words.length > 0 && (

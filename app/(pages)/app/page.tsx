@@ -4,9 +4,7 @@ import { useUser } from "@/contexts/UserContext"
 import InfoCard from "@/components/block/infoCard"
 import { useRouter } from "next/navigation"
 import { FEATURES as features } from "@/content/main"
-import { useEffect } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
-import CardSkeleton from "@/components/ui/cardSkeleton"
 
 export default function App() {
   const { currentUser, loading } = useUser()

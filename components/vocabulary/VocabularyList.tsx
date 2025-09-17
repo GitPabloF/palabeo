@@ -4,7 +4,7 @@ import WordCard from "@/components/block/wordCard/wordCard"
 import CardSkeleton from "@/components/ui/cardSkeleton"
 
 interface VocabularyListProps {
-  words: Word[]
+  words?: Word[]
   loading?: boolean
   onDelete?: (id: number) => void
   showAllTranslation?: boolean
@@ -18,7 +18,7 @@ export function VocabularyList({
 }: VocabularyListProps) {
   const [parent] = useAutoAnimate()
 
-  if (loading) {
+  if (!words || loading) {
     return (
       <div className="lex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         <CardSkeleton />
@@ -31,7 +31,7 @@ export function VocabularyList({
     )
   }
 
-  if (words.length === 0) {
+  if (words && words.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10 text-gray-400">
         <p className="text-lg font-medium">
