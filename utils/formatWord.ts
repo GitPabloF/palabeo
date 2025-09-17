@@ -28,6 +28,12 @@ export function formatWord(word: string): string {
   // Remove arrows and spaces
   let formattedWord = word.replace(/⇒\s*/g, "").trim()
 
+  // Remove content in parentheses and brackets
+  formattedWord = formattedWord
+    .replace(/\([^)]*\)/g, "")
+    .replace(/\[[^\]]*\]/g, "")
+    .trim()
+
   // Check if there is a comma (word separation)
   if (formattedWord.includes(",")) {
     const words = formattedWord.split(",").map((w) => w.trim())
@@ -42,6 +48,9 @@ export function formatWord(word: string): string {
         // If not, they are synonyms, keep the first
         return first
       }
+    } else {
+      // If more than 2 parts, keep only the first part
+      return words[0]
     }
   }
 

@@ -57,10 +57,12 @@ export default function Vocabulary() {
           onSearchChange={setSearchTerm}
         />
 
-        <VocabularyFilters
-          showAllTranslation={showAllTranslation}
-          onShowTranslationChange={setShowAllTranslation}
-        />
+        {paginatedItems.length > 0 && (
+          <VocabularyFilters
+            showAllTranslation={showAllTranslation}
+            onShowTranslationChange={setShowAllTranslation}
+          />
+        )}
 
         <div className="flex-1 min-h-0">
           <ScrollArea className="h-full rounded-2xl">

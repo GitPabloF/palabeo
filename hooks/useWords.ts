@@ -153,6 +153,10 @@ export function useWords(userId?: string) {
         return true
       }
     }
+    setError({
+      message: "An error occurred while adding the word",
+      status: 500,
+    })
     return false
   }
 

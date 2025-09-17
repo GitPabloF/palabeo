@@ -126,6 +126,7 @@ export async function POST(request: NextRequest) {
   // Validate session with robust validation
   const sessionValidation = validateSession(session)
   if (!sessionValidation.success) {
+    console.log("sessionValidation", sessionValidation.errors)
     return NextResponse.json(
       createValidationErrorResponse(sessionValidation.errors),
       { status: 401 }
@@ -134,15 +135,6 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-
-    // Validate word creation data
-    const validationResult = validateWordCreationData(body)
-    if (!validationResult.success) {
-      return NextResponse.json(
-        createValidationErrorResponse(validationResult.errors),
-        { status: 400 }
-      )
-    }
 
     const {
       wordFrom,
@@ -154,7 +146,7 @@ export async function POST(request: NextRequest) {
       exampleFrom,
       exampleTo,
       typeName,
-    } = validationResult.data!
+    } = body
 
     const isWordInDatabase = await prisma.word.findFirst({
       where: {
