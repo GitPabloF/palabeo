@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link"
 import Image from "next/image"
-
+import { Skeleton } from "@/components/ui/skeleton"
 import { usePathname } from "next/navigation"
 import { FEATURES } from "@/content/main"
 import {
@@ -30,7 +30,7 @@ import { useUser } from "@/contexts/UserContext"
 export default function AppSidebar() {
   const pathname = usePathname()
   const { data: session } = useSession()
-  const { currentUser } = useUser()
+  const { currentUser, loading } = useUser()
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/login" })
@@ -97,7 +97,14 @@ export default function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> {currentUser?.name || currentUser?.email || "User"}
+                  <User2 />
+                  {loading ? (
+                    <Skeleton className="w-4 h-4" />
+                  ) : (
+                    <span>
+                      {currentUser?.name || currentUser?.email || "User"}
+                    </span>
+                  )}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>

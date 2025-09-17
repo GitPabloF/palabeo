@@ -4,9 +4,13 @@ import { useUser } from "@/contexts/UserContext"
 import InfoCard from "@/components/block/infoCard"
 import { useRouter } from "next/navigation"
 import { FEATURES as features } from "@/content/main"
+import { useEffect } from "react"
+import { Skeleton } from "@/components/ui/skeleton"
+import CardSkeleton from "@/components/ui/cardSkeleton"
 
 export default function App() {
-  const { currentUser } = useUser()
+  const { currentUser, loading } = useUser()
+
   const router = useRouter()
 
   // reorder features : collection last, remove settings
@@ -20,6 +24,24 @@ export default function App() {
 
   const handleActivityClick = (route: string) => {
     router.push(route)
+  }
+
+  if (loading) {
+    return (
+      <div>
+        <div className="space-y-2">
+          <Skeleton className="w-1/2 h-10 mx-auto" />
+          <Skeleton className="w-1/2 h-10 mx-auto" />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full mt-6">
+          <Skeleton className="w-full h-70" />
+          <Skeleton className="w-full h-70" />
+          <div className="md:col-span-2">
+            <Skeleton className="w-full h-70" />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
