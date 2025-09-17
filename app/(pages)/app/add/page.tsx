@@ -8,7 +8,6 @@ import { Plus } from "lucide-react"
 import PageHeader from "@/components/block/pageHeader"
 import { VocabularyList } from "@/components/vocabulary/VocabularyList"
 import { Skeleton } from "@/components/ui/skeleton"
-import CardSkeleton from "@/components/ui/cardSkeleton"
 
 export default function AddPage() {
   const [translatedWord, setTranslatedWord] = useState<null | Word>(null)

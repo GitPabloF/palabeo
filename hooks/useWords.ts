@@ -7,6 +7,7 @@ import { apiRequest } from "@/utils/fetch"
 export function useWords(userId?: string) {
   const [words, setWords] = useState<PrismaWord[]>([])
   const [loading, setLoading] = useState(false)
+  const [addingWord, setAddingWord] = useState(false)
   const [error, setError] = useState<Error | null>(null)
 
   async function fetchWords() {
@@ -72,6 +73,8 @@ export function useWords(userId?: string) {
       return false
     }
 
+    setLoading(true)
+
     const { id: wordId } = word
 
     try {
@@ -120,6 +123,8 @@ export function useWords(userId?: string) {
         status: 500,
       })
       return false
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -182,6 +187,7 @@ export function useWords(userId?: string) {
   return {
     words,
     loading,
+    addingWord,
     error,
     addWord,
     deleteWord,
