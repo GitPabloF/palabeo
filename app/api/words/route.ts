@@ -126,7 +126,6 @@ export async function POST(request: NextRequest) {
   // Validate session with robust validation
   const sessionValidation = validateSession(session)
   if (!sessionValidation.success) {
-    console.log("sessionValidation", sessionValidation.errors)
     return NextResponse.json(
       createValidationErrorResponse(sessionValidation.errors),
       { status: 401 }
