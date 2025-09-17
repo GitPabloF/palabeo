@@ -58,9 +58,9 @@ export function LoginForm({
     }
   }
 
-  const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: "/app" })
-  }
+  // const handleGoogleSignIn = () => {
+  //   signIn("google", { callbackUrl: "/app" })
+  // }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -111,7 +111,7 @@ export function LoginForm({
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? "Signing in..." : "Login"}
                 </Button>
-                <Button
+                {/* <Button
                   type="button"
                   variant="outline"
                   className="w-full"
@@ -119,7 +119,7 @@ export function LoginForm({
                   disabled={isLoading}
                 >
                   Login with Google
-                </Button>
+                </Button> */}
               </div>
             </div>
             <div className="mt-4 text-center text-sm">
