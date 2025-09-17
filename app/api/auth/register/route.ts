@@ -1,18 +1,34 @@
 import { NextRequest, NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
 import { prisma } from "@/lib/prisma"
+import {
+  validateUserRegistrationData,
+  createValidationErrorResponse,
+} from "@/lib/validation"
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, name } = await request.json()
-
-    // Basic validation
-    if (!email || !password) {
+    // Parse and validate JSON
+    let requestData
+    try {
+      requestData = await request.json()
+    } catch (error) {
       return NextResponse.json(
-        { error: "Email and password are required" },
+        { error: "Invalid JSON in request body" },
         { status: 400 }
       )
     }
+
+    // Validate registration data
+    const validationResult = validateUserRegistrationData(requestData)
+    if (!validationResult.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(validationResult.errors),
+        { status: 400 }
+      )
+    }
+
+    const { email, password, name } = validationResult.data!
 
     // Check if the user already exists
     const existingUser = await prisma.user.findUnique({
@@ -22,7 +38,7 @@ export async function POST(request: NextRequest) {
     if (existingUser) {
       return NextResponse.json(
         { error: "User already exists" },
-        { status: 400 }
+        { status: 409 }
       )
     }
 
@@ -38,8 +54,15 @@ export async function POST(request: NextRequest) {
       },
     })
 
+    // Return sanitized response (exclude password hash)
     return NextResponse.json(
-      { message: "User created successfully", userId: user.id },
+      {
+        message: "User created successfully",
+        userId: user.id,
+        email: user.email,
+        name: user.name,
+        createdAt: user.createdAt,
+      },
       { status: 201 }
     )
   } catch (error) {

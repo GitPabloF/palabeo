@@ -599,16 +599,29 @@ export function validateSession(session: any): ValidationResult<{
     return { success: false, errors }
   }
 
+  const sessionObj = session as { user: unknown }
+
+  if (typeof sessionObj.user !== "object" || sessionObj.user === null) {
+    errors.push({
+      field: "session.user",
+      message: "User data must be an object",
+      code: "INVALID_TYPE",
+    })
+    return { success: false, errors }
+  }
+
+  const userObj = sessionObj.user as Record<string, unknown>
+
   // Validate email (required)
-  const emailResult = validateEmail(session.user.email)
+  const emailResult = validateEmail(userObj.email)
   if (!emailResult.success) {
     errors.push(...emailResult.errors)
   }
 
   // Validate user ID if present
   let sanitizedId: string | undefined
-  if (session.user.id) {
-    const idResult = validateUserId(session.user.id)
+  if (userObj.id) {
+    const idResult = validateUserId(userObj.id)
     if (!idResult.success) {
       errors.push(...idResult.errors)
     } else {
@@ -618,8 +631,8 @@ export function validateSession(session: any): ValidationResult<{
 
   // Validate role if present
   let sanitizedRole: string | undefined
-  if (session.user.role) {
-    const roleResult = validateUserRole(session.user.role)
+  if (userObj.role) {
+    const roleResult = validateUserRole(userObj.role)
     if (!roleResult.success) {
       errors.push(...roleResult.errors)
     } else {
@@ -629,8 +642,8 @@ export function validateSession(session: any): ValidationResult<{
 
   // Validate name if present
   let sanitizedName: string | undefined
-  if (session.user.name) {
-    const nameResult = validateUserName(session.user.name)
+  if (userObj.name) {
+    const nameResult = validateUserName(userObj.name)
     if (!nameResult.success) {
       errors.push(...nameResult.errors)
     } else {
@@ -1393,15 +1406,201 @@ export function validateWordsSearchParams(
 }
 
 /**
+ * Validates password strength
+ */
+export function validatePassword(password: string): ValidationResult<string> {
+  const errors: ValidationError[] = []
+
+  if (!password) {
+    errors.push({
+      field: "password",
+      message: "Password is required",
+      code: "REQUIRED",
+    })
+    return { success: false, errors }
+  }
+
+  if (typeof password !== "string") {
+    errors.push({
+      field: "password",
+      message: "Password must be a string",
+      code: "INVALID_TYPE",
+    })
+    return { success: false, errors }
+  }
+
+  if (password.length < 8) {
+    errors.push({
+      field: "password",
+      message: "Password must be at least 8 characters long",
+      code: "TOO_SHORT",
+    })
+  }
+
+  if (password.length > 128) {
+    errors.push({
+      field: "password",
+      message: "Password must be no more than 128 characters long",
+      code: "TOO_LONG",
+    })
+  }
+
+  // Check for at least one uppercase letter
+  if (!/[A-Z]/.test(password)) {
+    errors.push({
+      field: "password",
+      message: "Password must contain at least one uppercase letter",
+      code: "MISSING_UPPERCASE",
+    })
+  }
+
+  // Check for at least one lowercase letter
+  if (!/[a-z]/.test(password)) {
+    errors.push({
+      field: "password",
+      message: "Password must contain at least one lowercase letter",
+      code: "MISSING_LOWERCASE",
+    })
+  }
+
+  // Check for at least one number
+  if (!/\d/.test(password)) {
+    errors.push({
+      field: "password",
+      message: "Password must contain at least one number",
+      code: "MISSING_NUMBER",
+    })
+  }
+
+  // Check for at least one special character
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    errors.push({
+      field: "password",
+      message: "Password must contain at least one special character",
+      code: "MISSING_SPECIAL_CHAR",
+    })
+  }
+
+  // Check for common weak passwords
+  const commonPasswords = [
+    "password",
+    "123456",
+    "123456789",
+    "qwerty",
+    "abc123",
+    "password123",
+    "admin",
+    "letmein",
+    "welcome",
+    "monkey",
+    "1234567890",
+    "password1",
+    "qwerty123",
+  ]
+
+  if (commonPasswords.includes(password.toLowerCase())) {
+    errors.push({
+      field: "password",
+      message: "Password is too common, please choose a stronger password",
+      code: "COMMON_PASSWORD",
+    })
+  }
+
+  // Check for repeated characters (more than 3 in a row)
+  if (/(.)\1{3,}/.test(password)) {
+    errors.push({
+      field: "password",
+      message:
+        "Password cannot contain more than 3 repeated characters in a row",
+      code: "REPEATED_CHARS",
+    })
+  }
+
+  if (errors.length > 0) {
+    return { success: false, errors }
+  }
+
+  return {
+    success: true,
+    data: password,
+    errors: [],
+  }
+}
+
+/**
+ * Validates user registration data
+ */
+export function validateUserRegistrationData(data: unknown): ValidationResult<{
+  email: string
+  password: string
+  name?: string
+}> {
+  const errors: ValidationError[] = []
+
+  if (!data || typeof data !== "object") {
+    errors.push({
+      field: "data",
+      message: "Registration data is required",
+      code: "REQUIRED",
+    })
+    return { success: false, errors }
+  }
+
+  const dataObj = data as Record<string, unknown>
+
+  // Validate email
+  const emailResult = validateEmail(dataObj.email)
+  if (!emailResult.success) {
+    errors.push(...emailResult.errors)
+  }
+
+  // Validate password
+  const passwordResult = validatePassword(dataObj.password as string)
+  if (!passwordResult.success) {
+    errors.push(...passwordResult.errors)
+  }
+
+  // Validate name (optional)
+  let sanitizedName: string | undefined
+  if (dataObj.name !== undefined && dataObj.name !== null) {
+    if (typeof dataObj.name !== "string") {
+      errors.push({
+        field: "name",
+        message: "Name must be a string",
+        code: "INVALID_TYPE",
+      })
+    } else {
+      const nameResult = validateUserName(dataObj.name)
+      if (!nameResult.success) {
+        errors.push(...nameResult.errors)
+      } else {
+        sanitizedName = nameResult.data
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    return { success: false, errors }
+  }
+
+  return {
+    success: true,
+    data: {
+      email: emailResult.data!,
+      password: passwordResult.data!,
+      name: sanitizedName,
+    },
+    errors: [],
+  }
+}
+
+/**
  * Create a standardized error response for validation failures
  * @param errors - Array of validation errors
  * @param statusCode - HTTP status code (default: 400)
  * @returns NextResponse with error details
  */
-export function createValidationErrorResponse(
-  errors: ValidationError[],
-  statusCode: number = 400
-) {
+export function createValidationErrorResponse(errors: ValidationError[]) {
   return {
     error: "Validation failed",
     details: errors,
