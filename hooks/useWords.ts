@@ -70,7 +70,8 @@ export function useWords(userId?: string) {
     if (!userId) return false
 
     if (!validateWord(word)) {
-      return false
+      setError({ message: "All fields are required", status: 400 })
+      false
     }
 
     setLoading(true)

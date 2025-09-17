@@ -8,15 +8,22 @@ import { Plus } from "lucide-react"
 import PageHeader from "@/components/block/pageHeader"
 import { VocabularyList } from "@/components/vocabulary/VocabularyList"
 import { Skeleton } from "@/components/ui/skeleton"
+import { ErrorDisplay } from "@/components/ui/error-display"
 
 export default function AddPage() {
   const [translatedWord, setTranslatedWord] = useState<null | Word>(null)
 
   const { currentUser, loading: userLoading } = useUser()
-  const { addWord, words, loading } = useWords(currentUser?.id)
+  const { addWord, words, loading, error, clearError } = useWords(
+    currentUser?.id
+  )
 
   function handleTranslatedWord(word: Word | null) {
     setTranslatedWord(word)
+    // Clear error when user starts typing a new word
+    if (word && error) {
+      clearError()
+    }
   }
 
   const recentlyAddedWords = words.slice(-6).reverse()
@@ -39,6 +46,9 @@ export default function AddPage() {
         colorType="nm"
         icon={Plus}
       />
+
+      {/* Error Display */}
+      <ErrorDisplay error={error} onClear={clearError} />
 
       {/* Loading Skeleton */}
       {userLoading && (
