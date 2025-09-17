@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { ValidationError } from "@/lib/validation"
 
 export function RegisterForm({
   className,
@@ -23,23 +24,17 @@ export function RegisterForm({
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setError("")
+    setFieldErrors({}) // Reset field errors
 
-    // Validation côté client
+    // Client-side validation
     if (password !== confirmPassword) {
-      setError("Passwords do not match")
-      setIsLoading(false)
-      return
-    }
-
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters")
+      setFieldErrors({ confirmPassword: "Passwords do not match" })
       setIsLoading(false)
       return
     }
@@ -60,15 +55,26 @@ export function RegisterForm({
       const data = await response.json()
 
       if (response.ok) {
-        // Rediriger vers la page de connexion avec un message de succès
+        // Redirect to login page with success message
         router.push(
           "/login?message=Account created successfully! Please sign in."
         )
       } else {
-        setError(data.error || "Something went wrong")
+        // Handle detailed validation errors
+        if (data.details && Array.isArray(data.details)) {
+          // Create errors object by field
+          const errorsByField: Record<string, string> = {}
+          data.details.forEach((error: ValidationError) => {
+            errorsByField[error.field] = error.message
+          })
+          setFieldErrors(errorsByField)
+        } else {
+          // Simple error
+          setFieldErrors({ general: data.error || "Something went wrong" })
+        }
       }
     } catch (error) {
-      setError("Something went wrong")
+      setFieldErrors({ general: "Something went wrong" })
     } finally {
       setIsLoading(false)
     }
@@ -86,7 +92,11 @@ export function RegisterForm({
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
-              {error && <div className="text-red-500 text-sm">{error}</div>}
+              {fieldErrors.general && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                  {fieldErrors.general}
+                </div>
+              )}
 
               <div className="grid gap-3">
                 <Label htmlFor="name">Name</Label>
@@ -97,7 +107,15 @@ export function RegisterForm({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
+                  className={
+                    fieldErrors.name
+                      ? "border-red-500 focus:border-red-500"
+                      : ""
+                  }
                 />
+                {fieldErrors.name && (
+                  <div className="text-red-500 text-sm">{fieldErrors.name}</div>
+                )}
               </div>
 
               <div className="grid gap-3">
@@ -109,7 +127,17 @@ export function RegisterForm({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  className={
+                    fieldErrors.email
+                      ? "border-red-500 focus:border-red-500"
+                      : ""
+                  }
                 />
+                {fieldErrors.email && (
+                  <div className="text-red-500 text-sm">
+                    {fieldErrors.email}
+                  </div>
+                )}
               </div>
 
               <div className="grid gap-3">
@@ -120,7 +148,21 @@ export function RegisterForm({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  className={
+                    fieldErrors.password
+                      ? "border-red-500 focus:border-red-500"
+                      : ""
+                  }
                 />
+                {fieldErrors.password && (
+                  <div className="text-red-500 text-sm">
+                    {fieldErrors.password}
+                  </div>
+                )}
+                <div className="text-xs text-gray-500">
+                  Password must contain: uppercase, lowercase, number, special
+                  character (8+ chars)
+                </div>
               </div>
 
               <div className="grid gap-3">
@@ -131,7 +173,17 @@ export function RegisterForm({
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
+                  className={
+                    fieldErrors.confirmPassword
+                      ? "border-red-500 focus:border-red-500"
+                      : ""
+                  }
                 />
+                {fieldErrors.confirmPassword && (
+                  <div className="text-red-500 text-sm">
+                    {fieldErrors.confirmPassword}
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-col gap-3">
