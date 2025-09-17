@@ -6,6 +6,7 @@ import {
   createValidationErrorResponse,
   isAdminRole,
   sanitizeUserData,
+  validateSession,
 } from "@/lib/validation"
 /**
  * Create a new user
@@ -15,11 +16,17 @@ import {
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession()
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+    // Validate session with robust validation
+    const sessionValidation = validateSession(session)
+    if (!sessionValidation.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(sessionValidation.errors),
+        { status: 401 }
+      )
     }
 
-    if (!isAdminRole(session.user.role)) {
+    if (!isAdminRole(sessionValidation.data!.role)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 
@@ -94,11 +101,17 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   try {
     const session = await getServerSession()
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+    // Validate session with robust validation
+    const sessionValidation = validateSession(session)
+    if (!sessionValidation.success) {
+      return NextResponse.json(
+        createValidationErrorResponse(sessionValidation.errors),
+        { status: 401 }
+      )
     }
 
-    if (!isAdminRole(session.user.role)) {
+    if (!isAdminRole(sessionValidation.data!.role)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 })
     }
 

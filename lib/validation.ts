@@ -569,6 +569,92 @@ export function isAdminRole(userRole: string | undefined): boolean {
 }
 
 /**
+ * Validate session data for robust authentication
+ * @param session - The session object from NextAuth
+ * @returns Validation result with sanitized session data
+ */
+export function validateSession(session: any): ValidationResult<{
+  email: string
+  id?: string
+  role?: string
+  name?: string
+}> {
+  const errors: ValidationError[] = []
+
+  if (!session) {
+    errors.push({
+      field: "session",
+      message: "Session is required",
+      code: "REQUIRED",
+    })
+    return { success: false, errors }
+  }
+
+  if (!session.user) {
+    errors.push({
+      field: "session.user",
+      message: "User data is required in session",
+      code: "REQUIRED",
+    })
+    return { success: false, errors }
+  }
+
+  // Validate email (required)
+  const emailResult = validateEmail(session.user.email)
+  if (!emailResult.success) {
+    errors.push(...emailResult.errors)
+  }
+
+  // Validate user ID if present
+  let sanitizedId: string | undefined
+  if (session.user.id) {
+    const idResult = validateUserId(session.user.id)
+    if (!idResult.success) {
+      errors.push(...idResult.errors)
+    } else {
+      sanitizedId = idResult.data
+    }
+  }
+
+  // Validate role if present
+  let sanitizedRole: string | undefined
+  if (session.user.role) {
+    const roleResult = validateUserRole(session.user.role)
+    if (!roleResult.success) {
+      errors.push(...roleResult.errors)
+    } else {
+      sanitizedRole = roleResult.data
+    }
+  }
+
+  // Validate name if present
+  let sanitizedName: string | undefined
+  if (session.user.name) {
+    const nameResult = validateUserName(session.user.name)
+    if (!nameResult.success) {
+      errors.push(...nameResult.errors)
+    } else {
+      sanitizedName = nameResult.data
+    }
+  }
+
+  if (errors.length > 0) {
+    return { success: false, errors }
+  }
+
+  return {
+    success: true,
+    data: {
+      email: emailResult.data!,
+      id: sanitizedId,
+      role: sanitizedRole,
+      name: sanitizedName,
+    },
+    errors: [],
+  }
+}
+
+/**
  * Validate and sanitize a user ID (CUID format)
  * @param userId - The user ID to validate
  * @returns Validation result
