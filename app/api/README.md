@@ -10,11 +10,9 @@ Most endpoints require authentication via NextAuth.js. The API uses JWT tokens f
 
 All API endpoints are prefixed with `/api/`
 
-## Routes Overview
+## Authentication Routes
 
-### Authentication Routes
-
-#### `POST /api/auth/register`
+### `POST /api/auth/register`
 
 Register a new user account.
 
@@ -44,9 +42,9 @@ NextAuth.js authentication endpoints for login/logout.
 - JWT session strategy
 - Role-based access control
 
-### Translation Routes
+## Translation Routes
 
-#### `GET /api/translate`
+### `GET /api/translate`
 
 Translate a word using the WordReference API.
 
@@ -77,9 +75,9 @@ Translate a word using the WordReference API.
 
 **Rate Limiting:** 429 status when rate limit exceeded
 
-### User Routes
+## User Routes
 
-#### `GET /api/users`
+### `GET /api/users`
 
 Get all users (Admin only).
 
@@ -95,7 +93,7 @@ Get all users (Admin only).
 }
 ```
 
-#### `POST /api/users`
+### `POST /api/users`
 
 Create a new user (Admin only).
 
@@ -112,7 +110,7 @@ Create a new user (Admin only).
 }
 ```
 
-#### `GET /api/users/me`
+### `GET /api/users/me`
 
 Get current user's profile and recent words.
 
@@ -135,7 +133,7 @@ Get current user's profile and recent words.
 }
 ```
 
-#### `GET /api/users/[userId]`
+### `GET /api/users/[userId]`
 
 Get a specific user by ID.
 
@@ -145,7 +143,7 @@ Get a specific user by ID.
 
 - `userId`: User ID (UUID)
 
-#### `PUT /api/users/[userId]`
+### `PUT /api/users/[userId]`
 
 Update a user's information.
 
@@ -162,15 +160,15 @@ Update a user's information.
 }
 ```
 
-#### `DELETE /api/users/[userId]`
+### `DELETE /api/users/[userId]`
 
 Delete a user account.
 
 **Authentication:** Required (Own account only)
 
-### User Words Routes
+## User Words Routes
 
-#### `GET /api/users/[userId]/words`
+### `GET /api/users/[userId]/words`
 
 Get all words for a specific user.
 
@@ -198,7 +196,7 @@ Get all words for a specific user.
 }
 ```
 
-#### `POST /api/users/[userId]/words/[wordId]`
+### `POST /api/users/[userId]/words/[wordId]`
 
 Add a word to a user's vocabulary list.
 
@@ -226,7 +224,7 @@ Add a word to a user's vocabulary list.
 }
 ```
 
-#### `DELETE /api/users/[userId]/words/[wordId]`
+### `DELETE /api/users/[userId]/words/[wordId]`
 
 Remove a word from a user's vocabulary list.
 
@@ -237,9 +235,9 @@ Remove a word from a user's vocabulary list.
 - `userId`: User ID (UUID)
 - `wordId`: Word ID (number)
 
-### Words Routes
+## Words Routes
 
-#### `GET /api/words`
+### `GET /api/words`
 
 Search and filter words in the database.
 
@@ -273,7 +271,7 @@ Search and filter words in the database.
 ]
 ```
 
-#### `POST /api/words`
+### `POST /api/words`
 
 Create a new word in the database.
 
@@ -295,7 +293,7 @@ Create a new word in the database.
 }
 ```
 
-#### `GET /api/words/[wordId]`
+### `GET /api/words/[wordId]`
 
 Get a specific word by ID.
 
@@ -305,7 +303,7 @@ Get a specific word by ID.
 
 - `wordId`: Word ID (number)
 
-#### `DELETE /api/words/[wordId]`
+### `DELETE /api/words/[wordId]`
 
 Delete a word from the database (Admin only).
 
