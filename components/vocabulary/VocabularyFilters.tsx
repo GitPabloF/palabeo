@@ -28,7 +28,7 @@ export function VocabularyFilters({
 
   return (
     <Card>
-      <CardContent className="flex gap-4 justify-between">
+      <CardContent className="flex gap-4 flex-col sm:flex-row justify-between">
         {/* Sort Options */}
         <div className="flex items-center gap-4">
           <span className="font-bold">Sort by:</span>

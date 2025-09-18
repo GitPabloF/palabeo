@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { User2 } from "lucide-react"
 import { ChevronUp } from "lucide-react"
-
+import { useSidebar } from "@/components/ui/sidebar"
 import {
   Sidebar,
   SidebarContent,
@@ -31,9 +31,17 @@ export default function AppSidebar() {
   const pathname = usePathname()
   const { data: session } = useSession()
   const { currentUser, loading } = useUser()
+  const { setOpenMobile, isMobile } = useSidebar()
 
   const handleSignOut = () => {
     signOut({ callbackUrl: "/login" })
+  }
+
+  const handleLinkClick = () => {
+    // Close sidebar on mobile when clicking on navigation links
+    if (isMobile) {
+      setOpenMobile(false)
+    }
   }
 
   return (
@@ -44,6 +52,7 @@ export default function AppSidebar() {
           href="/app"
           className="flex items-center gap-2 py-3 px-5"
           aria-label="Go to main app page"
+          onClick={handleLinkClick}
         >
           <Image
             src="/logo.svg"
@@ -74,6 +83,7 @@ export default function AppSidebar() {
                       <Link
                         href={`/app/${feature.path}`}
                         className="transition-colors duration-200 py-2 px-5"
+                        onClick={handleLinkClick}
                       >
                         <span className="flex items-center gap-2 transition-transform peer-hover/menu-button:translate-x-2">
                           {feature.icon && <feature.icon className="w-5 h-5" />}

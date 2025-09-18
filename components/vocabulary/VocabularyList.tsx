@@ -43,7 +43,7 @@ export function VocabularyList({
 
   return (
     <div
-      className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+      className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 p-5"
       ref={parent}
     >
       {words.map((word) => (
