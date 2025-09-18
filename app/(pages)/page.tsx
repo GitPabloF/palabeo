@@ -228,7 +228,7 @@ export default function Home() {
               Which languages are supported?
             </div>
             <p className="mt-1 text-sm text-gray-600">
-              Start with English, French, and Spanish. More coming soon.
+              Start with Spanish. More coming soon.
             </p>
           </div>
           <div className="rounded-xl border bg-white p-5">
@@ -243,10 +243,10 @@ export default function Home() {
         </div>
         <div className="text-center mt-8">
           <Link
-            href="/login"
+            href="/app"
             className="rounded-md bg-blue-600 px-5 py-3 text-white font-semibold shadow-sm hover:bg-blue-600/90 transition"
           >
-            Sign in to your space
+            Access your space
           </Link>
         </div>
       </section>
