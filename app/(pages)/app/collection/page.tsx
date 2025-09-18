@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useSearchParams } from "next/navigation"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useUser } from "@/contexts/UserContext"
@@ -8,7 +8,10 @@ import { useWords } from "@/hooks/useWords"
 import { useSearch } from "@/hooks/useSearch"
 import { usePagination } from "@/hooks/usePagination"
 import { VocabularyHeader } from "@/components/vocabulary/VocabularyHeader"
-import { VocabularyFilters } from "@/components/vocabulary/VocabularyFilters"
+import {
+  VocabularyFilters,
+  SortOption,
+} from "@/components/vocabulary/VocabularyFilters"
 import { VocabularyList } from "@/components/vocabulary/VocabularyList"
 import CustomPagination from "@/components/block/customPagination"
 
@@ -16,6 +19,7 @@ export default function Vocabulary() {
   const { currentUser } = useUser()
   const { words, loading, error, deleteWord } = useWords(currentUser?.id)
   const [showAllTranslation, setShowAllTranslation] = useState(false)
+  const [sortBy, setSortBy] = useState<SortOption>("recentlyAdded")
 
   const searchParams = useSearchParams()
   const currentPage = Number(searchParams.get("page") || 1)
@@ -26,8 +30,25 @@ export default function Vocabulary() {
     searchFields: ["wordFrom", "wordTo"],
   })
 
+  // Apply sorting
+  const sortedItems = useMemo(() => {
+    const items = [...filteredItems]
+
+    if (sortBy === "alphabetical") {
+      return items.sort((a, b) => a.wordFrom.localeCompare(b.wordFrom))
+    } else if (sortBy === "recentlyAdded") {
+      return items.sort((a, b) => {
+        const dateA = new Date(a.createdAt || 0)
+        const dateB = new Date(b.createdAt || 0)
+        return dateB.getTime() - dateA.getTime()
+      })
+    }
+
+    return items
+  }, [filteredItems, sortBy])
+
   const { paginatedItems, totalPages } = usePagination({
-    items: filteredItems,
+    items: sortedItems,
     pageSize,
     currentPage,
   })
@@ -61,6 +82,8 @@ export default function Vocabulary() {
           <VocabularyFilters
             showAllTranslation={showAllTranslation}
             onShowTranslationChange={setShowAllTranslation}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
           />
         )}
 
