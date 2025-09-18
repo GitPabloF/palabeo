@@ -117,23 +117,23 @@ export default function Home() {
 
         {/* Preview Card Stack using WordCard */}
         <div className="mt-12 flex justify-center">
-          <div className="relative group w-[320px] h-[440px]">
-            {/* Back card */}
-            <div className="absolute top-1/2 left-[calc(50%-56px)] w-[260px] -translate-y-1/2 -rotate-6 transition-all duration-500 group-hover:left-[calc(50%-72px)] z-0">
+          <div className="relative group w-[500px] h-[440px]">
+            {/* Back card - Spanish */}
+            <div className="absolute top-1/2 left-50 sm:left-[340px] w-[220px] sm:w-[260px] -translate-y-1/2 rotate-12 z-0">
               <WordCard
                 {...sampleWords[2]}
                 createdAt={new Date().toISOString()}
               />
             </div>
-            {/* Middle card */}
-            <div className="absolute top-1/2 left-[calc(50%+56px)] w-[260px] -translate-y-1/2 rotate-6 transition-all duration-500 group-hover:left-[calc(50%+72px)] z-[5]">
+            {/* Middle card - Speak */}
+            <div className="absolute top-[200px] left-20 sm:left-[160px] w-[220px] sm:w-[260px] -translate-y-1/2 rotate-2 z-[5]">
               <WordCard
                 {...sampleWords[1]}
                 createdAt={new Date().toISOString()}
               />
             </div>
-            {/* Front card */}
-            <div className="absolute left-1/2 top-1/2 w-[270px] -translate-x-1/2 -translate-y-1/2 transition-transform duration-500 group-hover:scale-[1.02] z-10">
+            {/* Front card - I can */}
+            <div className="absolute top-1/2 -left-10 sm:left-0 w-[220px] sm:w-[260px] -translate-y-1/2 z-10 -rotate-10">
               <WordCard
                 {...sampleWords[0]}
                 createdAt={new Date().toISOString()}
