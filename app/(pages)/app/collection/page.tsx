@@ -8,47 +8,34 @@ import { useWords } from "@/hooks/useWords"
 import { useSearch } from "@/hooks/useSearch"
 import { usePagination } from "@/hooks/usePagination"
 import { VocabularyHeader } from "@/components/vocabulary/VocabularyHeader"
-import {
-  VocabularyFilters,
-  SortOption,
-} from "@/components/vocabulary/VocabularyFilters"
+import { VocabularyFilters } from "@/components/vocabulary/VocabularyFilters"
 import { VocabularyList } from "@/components/vocabulary/VocabularyList"
 import CustomPagination from "@/components/block/customPagination"
+import { useVocabularyFilters } from "@/hooks/useVocabularyFilters"
 
 export default function Vocabulary() {
   const { currentUser } = useUser()
   const { words, loading, error, deleteWord } = useWords(currentUser?.id)
   const [showAllTranslation, setShowAllTranslation] = useState(false)
-  const [sortBy, setSortBy] = useState<SortOption>("recentlyAdded")
 
   const searchParams = useSearchParams()
   const currentPage = Number(searchParams.get("page") || 1)
   const pageSize = 15
 
+  // Search functionality
   const { searchTerm, setSearchTerm, filteredItems } = useSearch({
     items: words,
     searchFields: ["wordFrom", "wordTo"],
   })
 
-  // Apply sorting
-  const sortedItems = useMemo(() => {
-    const items = [...filteredItems]
+  // Sorting functionality hook
+  const { sortBy, setSortBy, sortedWords } = useVocabularyFilters({
+    words: filteredItems,
+  })
 
-    if (sortBy === "alphabetical") {
-      return items.sort((a, b) => a.wordFrom.localeCompare(b.wordFrom))
-    } else if (sortBy === "recentlyAdded") {
-      return items.sort((a, b) => {
-        const dateA = new Date(a.createdAt || 0)
-        const dateB = new Date(b.createdAt || 0)
-        return dateB.getTime() - dateA.getTime()
-      })
-    }
-
-    return items
-  }, [filteredItems, sortBy])
-
+  // Pagination
   const { paginatedItems, totalPages } = usePagination({
-    items: sortedItems,
+    items: sortedWords,
     pageSize,
     currentPage,
   })

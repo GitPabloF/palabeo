@@ -1,12 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import ShowButton from "@/components/ui/showButton"
-import { WORD_TYPE } from "@/content/main"
 import { cn } from "@/lib/utils"
-import { WordTypeCode } from "@/types/main"
 
 export type SortOption = "alphabetical" | "recentlyAdded"
-export type FilterOption = "all" | WordTypeCode
 
 interface VocabularyFiltersProps {
   showAllTranslation: boolean
