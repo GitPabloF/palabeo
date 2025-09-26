@@ -81,14 +81,20 @@ export function useTranslate(
 
       if (!translateResponse.ok) {
         setIsLoading(false)
-        setError({ message: "Error translating word", status: 500 })
+        setError({
+          message: `Error translating word, maybe the word ${word} not exists?`,
+          status: 500,
+        })
         return false
       }
 
       const translatedWord = await translateResponse.json()
       if (!translatedWord.data) {
         setIsLoading(false)
-        setError({ message: "Error translating word", status: 500 })
+        setError({
+          message: `Error translating ${word}, please try later or try another word`,
+          status: 500,
+        })
         return false
       }
 
@@ -98,7 +104,10 @@ export function useTranslate(
       return true
     } catch (error) {
       setIsLoading(false)
-      setError({ message: "Error checking word", status: 500 })
+      setError({
+        message: `Error checking word ${word}, please try later or try another word`,
+        status: 500,
+      })
       return false
     }
   }

@@ -14,6 +14,7 @@ import CardSkeleton from "@/components/ui/cardSkeleton"
 import { useAutoAnimate } from "@formkit/auto-animate/react"
 import { useTranslate } from "@/hooks/useTranslate"
 import LangToogler from "@/components/block/LangToogler"
+import type { Error as ApiError } from "@/types/response" // Import with alias
 
 import {
   Form,
@@ -34,6 +35,7 @@ type AddProps = {
   userId: string
   userLanguage: LangCode
   leanedLanguage: LangCode
+  onError?: (error: ApiError | null) => void
 }
 
 export default function Add({
@@ -42,6 +44,7 @@ export default function Add({
   userLanguage,
   leanedLanguage,
   userId,
+  onError,
 }: AddProps) {
   const [parent] = useAutoAnimate()
 
@@ -109,6 +112,12 @@ export default function Add({
     e.preventDefault()
     handleAddSubmit()
   }
+
+  useEffect(() => {
+    if (onError) {
+      onError(error)
+    }
+  }, [error, onError])
 
   return (
     <Card className="w-full shadow-xl border-0 bg-gradient-to-br from-white to-gray-50/50">

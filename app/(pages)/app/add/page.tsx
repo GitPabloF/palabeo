@@ -9,9 +9,11 @@ import PageHeader from "@/components/block/pageHeader"
 import { VocabularyList } from "@/components/vocabulary/VocabularyList"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ErrorDisplay } from "@/components/ui/error-display"
+import type { Error as ApiError } from "@/types/response"
 
 export default function AddPage() {
   const [translatedWord, setTranslatedWord] = useState<null | Word>(null)
+  const [translateError, setTranslateError] = useState<ApiError | null>(null)
 
   const { currentUser, loading: userLoading } = useUser()
   const { addWord, words, loading, error, clearError } = useWords(
@@ -21,9 +23,14 @@ export default function AddPage() {
   function handleTranslatedWord(word: Word | null) {
     setTranslatedWord(word)
     // Clear error when user starts typing a new word
-    if (word && error) {
+    if (word && (error || translateError)) {
       clearError()
+      setTranslateError(null)
     }
+  }
+
+  function handleTranslateError(error: ApiError | null) {
+    setTranslateError(error)
   }
 
   const recentlyAddedWords = words.slice(-6).reverse()
@@ -47,8 +54,14 @@ export default function AddPage() {
         icon={Plus}
       />
 
-      {/* Error Display */}
-      <ErrorDisplay error={error} onClear={clearError} />
+      {/* Error Display - show both useWords and useTranslate errors */}
+      <ErrorDisplay
+        error={error || translateError}
+        onClear={() => {
+          clearError()
+          setTranslateError(null)
+        }}
+      />
 
       {/* Loading Skeleton */}
       {userLoading && (
@@ -68,6 +81,7 @@ export default function AddPage() {
             userId={currentUser.id}
             userLanguage={currentUser.userLanguage}
             leanedLanguage={currentUser.learnedLanguage}
+            onError={handleTranslateError}
           />
         </section>
       )}
